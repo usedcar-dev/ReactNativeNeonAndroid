@@ -1,0 +1,22 @@
+<resources>
+
+    <style name="NeonAppCompatNoActionBarTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="NeonAppCompatNoActionBarTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+    <style name="NeonLibTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+
+    <style name="textStyleWhite">
+        <item name="android:color">@color/white</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textAppearance">@style/TextAppearance.FontPath</item>
+    </style>
+
+
+</resources>

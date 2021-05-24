@@ -1,0 +1,90 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+
+    <RelativeLayout
+        android:id="@+id/header_options_imageereview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:orientation="horizontal"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp">
+
+        <ImageView
+            android:id="@+id/imagereview_deletebtn"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_alignParentLeft="true"
+            android:clickable="true"
+            android:padding="5dp"
+            android:src="@drawable/delete" />
+
+        <ImageView
+            android:id="@+id/imagereview_cropbtn"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_centerHorizontal="true"
+            android:clickable="true"
+            android:padding="5dp"
+            android:src="@drawable/crop" />
+
+        <ImageView
+            android:id="@+id/imagereview_rotatebtn"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_alignParentRight="true"
+            android:clickable="true"
+            android:padding="5dp"
+            android:src="@drawable/rotate" />
+
+    </RelativeLayout>
+
+    <!--<com.isseiaoki.simplecropview.CropImageView
+         android:id="@+id/imagereview_imageview"
+         xmlns:custom="http://schemas.android.com/apk/res-auto"
+         android:layout_width="match_parent"
+         android:layout_height="match_parent"
+         android:layout_above="@+id/footer_layout_imagereview_fragment"
+         android:layout_below="@+id/header_options_imageereview"
+         android:layout_marginLeft="15dp"
+         android:layout_marginRight="15dp"
+         custom:scv_crop_mode="free"
+         />-->
+
+
+    <ImageView
+        android:id="@+id/imagereview_imageview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/footer_layout_imagereview_fragment"
+        android:layout_below="@+id/header_options_imageereview"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp" />
+
+    <LinearLayout
+        android:id="@+id/footer_layout_imagereview_fragment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:background="@color/white"
+        android:paddingLeft="15dp"
+        android:paddingRight="15dp">
+
+        <TextView
+            android:id="@+id/imagereview_tag_spinner"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:background="@drawable/custom_dropdown"
+            android:ellipsize="end"
+            android:gravity="center_vertical"
+            android:singleLine="true"
+            android:text="Select Label"
+            android:textColor="@color/black" />
+
+    </LinearLayout>
+
+
+</RelativeLayout>

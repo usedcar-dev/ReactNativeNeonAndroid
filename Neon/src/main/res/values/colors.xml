@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="blue">#ff59a9ff</color>
+    <color name="orange">#ffff900d</color>
+    <color name="bottom_background_color">#ffc4c2bc</color>
+    <color name="hintColor">#AEAEAE</color>
+    <color name="polygonViewCircleStrokeColor">#ff59a9ff</color>
+    <color name="polygonViewCircleBackground">#90e5f8ff</color>
+    <color name="tranparent_black">#40000000</color>
+    <color name="black">#000000</color>
+    <color name="white">#FFFFFF</color>
+    <color name="transparent_white">#80FFFFFF</color>
+    <color name="transparent_blue">#800000ff</color>
+    <color name="selected_checkbox_color">#CECECE</color>
+    <color name="strokeColor">#CECECE</color>
+    <color name="textColor">#263242</color>
+    <color name="actionbar_background">#263242</color>
+    <color name="gaadi_blue">#263242</color>
+    <color name="hintStrokeColor">#80CECECE</color>
+    <color name="green">#86be65</color>
+
+    <color name="colorPrimary">#DC592B</color>
+    <color name="tagColor">#80000000</color>
+
+    <color name="neon_buttons_color">#DC592B</color>
+    <color name="neon_toolbar_color">#DC592B</color>
+    <color name="neon_toolbar_icons_color">#ffffff</color>
+
+    <color name="colorPrimaryDark">#BA4824</color>
+    <color name="textColorPrimary">#FFFFFF</color>
+    <color name="transparentBlackBg">#80000000</color>
+    <color name="transparent">#00000000</color>
+    <color name="action_bar_title_color">@color/white</color>
+    <color name="red">#FF0000</color>
+    <color name="black_85">#D9000000</color>
+
+    <color name="colorAccent">#FF4081</color>
+    <color name="dark_gray">#363434</color>
+    <color name="grey_light">#ffd3d3d3</color>
+</resources>

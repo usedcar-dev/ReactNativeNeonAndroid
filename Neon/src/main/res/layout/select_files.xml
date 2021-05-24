@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    android:id="@+id/rlSelectFiles"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="@dimen/grid_column_width"
+    android:layout_height="@dimen/three_coloumn_height"
+    android:orientation="vertical">
+
+
+    <ImageView
+        android:contentDescription="@null"
+        android:id="@+id/imageSelected"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/three_coloumn_height"
+        android:adjustViewBounds="true"
+        android:src="@drawable/image_load_default_small" />
+
+
+    <ImageView
+        android:contentDescription="@null"
+        android:id="@+id/vTransparentLayer"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/three_coloumn_height"
+        android:adjustViewBounds="true"
+        android:fitsSystemWindows="true"
+        android:src="@color/tranparent_black"
+        android:visibility="gone" />
+
+    <ImageView
+        android:contentDescription="@null"
+        android:id="@+id/selection_view"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_centerInParent="true"
+        android:src="@drawable/check"
+        android:visibility="gone" />
+</RelativeLayout>

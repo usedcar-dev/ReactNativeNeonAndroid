@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="com.customise.gaadi.camera.MainActivity">
+
+<ScrollView
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:layout_marginTop="10dp">
+
+            <EditText
+                android:id="@+id/editTextCompressRatio"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Enter Compress Ratio.">
+
+            </EditText>
+
+            <Button
+                android:id="@+id/buttonCompressImage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="compressImageClicked"
+                android:layout_marginTop="20dp"
+                android:text="Compress Image"
+                android:textAllCaps="false">
+
+            </Button>
+
+        </LinearLayout>
+
+        <Button
+            android:text="Camera Only"
+            android:onClick="cameraOnlyClicked"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <Button
+            android:text="Camera Priority"
+            android:onClick="cameraPriorityClicked"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+
+
+        <Button
+            android:onClick="gridOnlyFolderClicked"
+            android:layout_marginTop="20dp"
+            android:text="Grid only Structure (Folders)"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <Button
+            android:onClick="gridPriorityFolderClicked"
+            android:text="Grid priority Structure (Folders)"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <Button
+            android:onClick="gridOnlyFilesClicked"
+            android:text="Grid only Structure (Files)"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+
+        <Button
+            android:onClick="gridPriorityFilesClicked"
+            android:text="Grid priority Structure (Files)"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+
+
+
+
+
+
+
+        <Button
+            android:onClick="horizontalOnlyFolderClicked"
+            android:layout_marginTop="20dp"
+            android:text="Horizontal only Structure (Folders)"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <Button
+            android:onClick="horizontalPriorityFolderClicked"
+            android:text="Horizontal priority Structure (Folders)"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <Button
+            android:onClick="horizontalOnlyFilesClicked"
+            android:text="Horizontal only Structure (Files)"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+
+        <Button
+            android:onClick="horizontalPrioriyFilesClicked"
+            android:text="Horizontal priority Structure (Files)"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+
+
+
+
+
+
+
+
+
+        <Button
+            android:text="Neutral"
+            android:onClick="neutralClicked"
+            android:layout_marginTop="20dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+        <Button
+            android:id="@+id/livePhoto"
+            android:text="Live Photo"
+            android:onClick="livePhotoClick"
+            android:layout_marginTop="20dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+        <Button
+            android:id="@+id/oneStep"
+            android:text="One Step"
+            android:onClick="oneStepClick"
+            android:layout_marginTop="20dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+
+    </LinearLayout>
+
+</ScrollView>
+
+
+</LinearLayout>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white">
+
+
+    <GridView
+        android:id="@+id/gvFolders"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:columnWidth="@dimen/grid_column_width"
+        android:horizontalSpacing="@dimen/gv_horizontal_spacing"
+        android:numColumns="2"
+        android:verticalSpacing="@dimen/gv_vertical_spacing">
+
+    </GridView>
+
+</RelativeLayout>
+

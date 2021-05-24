@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.scanlibrary">
+
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="true" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
+    <application
+        android:allowBackup="true"
+        android:label="@string/app_name"
+        android:largeHeap="true"
+        android:theme="@style/NeonAppCompatNoActionBarTheme">
+        <activity
+            android:name="com.gaadi.neon.activity.CameraActivity"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait"
+            android:theme="@style/NeonAppCompatNoActionBarTheme" />
+        <activity
+            android:name="com.gaadi.neon.activity.camera.NormalCameraActivityNeon"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait"
+            android:theme="@style/NeonAppCompatNoActionBarTheme" />
+        <activity
+            android:name="com.gaadi.neon.activity.CameraActivity1"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait"
+            android:theme="@style/NeonAppCompatNoActionBarTheme" />
+        <activity
+            android:name="com.gaadi.neon.activity.GalleryActivity"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait"
+            android:theme="@style/NeonAppCompatNoActionBarTheme" />
+        <activity
+            android:name="com.gaadi.neon.activity.ImageReviewActivity"
+            android:launchMode="singleTask" />
+        <activity
+            android:name="com.gaadi.neon.activity.neutral.NeonNeutralActivity"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="com.gaadi.neon.activity.GalleryFiles"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait"
+            android:theme="@style/NeonAppCompatNoActionBarTheme" />
+        <activity
+            android:name="com.gaadi.neon.activity.LNeutralActivity"
+            android:label="@string/title_activity_neutral"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait"
+            android:theme="@style/NeonAppCompatNoActionBarTheme" />
+        <activity
+            android:name="com.gaadi.neon.activity.ReviewImageActivity"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait"
+            android:theme="@style/NeonAppCompatNoActionBarTheme" />
+        <activity
+            android:name="com.gaadi.neon.activity.gallery.GridFoldersActivity"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="com.gaadi.neon.activity.gallery.GridFilesActivity"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="com.gaadi.neon.activity.ImageShow"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="com.soundcloud.android.crop.CropImageActivity"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="com.gaadi.neon.activity.gallery.HorizontalFilesActivity"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="com.gaadi.neon.activity.finance.OneStepActivity"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait" />
+        <!-- Nougat specific -->
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="@string/neon_file_provider_authority"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/provider_paths" />
+        </provider>
+
+    </application>
+
+</manifest>

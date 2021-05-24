@@ -1,0 +1,49 @@
+apply plugin: 'com.android.application'
+
+android {
+//    signingConfigs {
+//        config {
+//            keyAlias 'lakshay'
+//            keyPassword '123456'
+//            storeFile file('/home/lakshaygirdhar/Downloads/lakshay.jks')
+//            storePassword '123456'
+//        }
+//    }
+    compileSdkVersion 27
+    buildToolsVersion '27.0.3'
+    defaultConfig {
+        applicationId "com.customise.gaadi.camera"
+        minSdkVersion 16
+        targetSdkVersion 26
+        versionCode 1
+        versionName "1.0"
+        multiDexEnabled true
+        vectorDrawables.useSupportLibrary = true
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            resValue("string", "neon_file_provider_authority", "com.gaadi.neon.provider")
+//            signingConfig signingConfigs.config
+        }
+        debug {
+            debuggable true
+            resValue("string", "neon_file_provider_authority", "com.gaadi.neon.provider")
+//            signingConfig signingConfigs.config
+        }
+    }
+}
+
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+//    testCompile 'junit:junit:4.12'
+    implementation project(':Neon')
+    implementation 'com.android.support:multidex:1.0.3'
+    implementation 'com.android.support:design:27.1.1'
+    implementation 'com.android.support:exifinterface:27.1.1'
+    implementation 'com.android.support.constraint:constraint-layout:1.1.3'
+    implementation 'com.google.android.gms:play-services-location:16.0.0'
+}
