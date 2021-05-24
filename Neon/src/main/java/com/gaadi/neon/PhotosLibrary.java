@@ -3,6 +3,9 @@ package com.gaadi.neon;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
+import android.os.Environment;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.gaadi.neon.activity.camera.NormalCameraActivityNeon;
@@ -18,15 +21,21 @@ import com.gaadi.neon.interfaces.INeutralParam;
 import com.gaadi.neon.interfaces.LivePhotosListener;
 import com.gaadi.neon.interfaces.OnImageCollectionListener;
 import com.gaadi.neon.model.PhotosMode;
-import com.gaadi.neon.util.Constants;
 import com.gaadi.neon.util.FileInfo;
 import com.gaadi.neon.util.NeonException;
 import com.gaadi.neon.util.NeonImagesHandler;
-import com.gaadi.neon.util.OneStepImageHandler;
 import com.gaadi.neon.util.OneStepImageHandler.OneStepActionListener;
+import com.gaadi.neon.util.OneStepImageHandler;
+import com.gaadi.neon.util.Constants;
 import com.intsig.csopen.sdk.CSOpenAPI;
 import com.intsig.csopen.sdk.CSOpenAPIParam;
+import com.intsig.csopen.sdk.CSOpenApiFactory;
+import com.scanlibrary.R;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -34,8 +43,6 @@ import java.util.List;
  * @since 13-08-2016
  */
 public class PhotosLibrary {
-
-    public static final boolean showBlurred = false;
 
     public static void collectLivePhotos(int requestCode, LibraryMode libraryMode, final Context activity,
                                          final OnImageCollectionListener imageCollectionListener,

@@ -31,30 +31,30 @@ public class ImageShowAdapter extends BaseDynamicGridAdapter {
     private boolean isProfileTagOnly;
 
     public ImageShowAdapter(Context context, boolean isProfileTagOnly) {
-        super(context, NeonImagesHandler.getSingletonInstance().getImagesCollectionConditional(), 2);
+        super(context, NeonImagesHandler.getSingletonInstance().getImagesCollection(), 2);
         this.context = context;
         this.isProfileTagOnly = isProfileTagOnly;
     }
 
     @Override
     public int getCount() {
-        if (NeonImagesHandler.getSingletonInstance().getImagesCollectionConditional() != null) {
-            return NeonImagesHandler.getSingletonInstance().getImagesCollectionConditional().size();
+        if (NeonImagesHandler.getSingletonInstance().getImagesCollection() != null) {
+            return NeonImagesHandler.getSingletonInstance().getImagesCollection().size();
         }
         return 0;
     }
 
    /* @Override
     public int getCount() {
-        if(NeonImagesHandler.getSingleonInstance().getImagesCollectionConditional() != null) {
-            return NeonImagesHandler.getSingleonInstance().getImagesCollectionConditional().size();
+        if(NeonImagesHandler.getSingleonInstance().getImagesCollection() != null) {
+            return NeonImagesHandler.getSingleonInstance().getImagesCollection().size();
         }
         return 0;
     }*/
 
    /* @Override
     public Object getItem(int position) {
-        return NeonImagesHandler.getSingleonInstance().getImagesCollectionConditional().get(position);
+        return NeonImagesHandler.getSingleonInstance().getImagesCollection().get(position);
     }*/
 
 
@@ -71,7 +71,7 @@ public class ImageShowAdapter extends BaseDynamicGridAdapter {
         } else {
             holder = (PhotosHolder) convertView.getTag();
         }
-        List<FileInfo> fileInfoList = NeonImagesHandler.getSingleonInstance().getImagesCollectionConditional();
+        List<FileInfo> fileInfoList = NeonImagesHandler.getSingleonInstance().getImagesCollection();
         if(fileInfoList != null && fileInfoList.size() > 0){
             if (isProfileTagOnly) {
                 if (position > 0) {
@@ -103,8 +103,8 @@ public class ImageShowAdapter extends BaseDynamicGridAdapter {
                         if (context instanceof NeonNeutralActivity) {
                             ((NeonNeutralActivity) context).onPostResume();
                         }
-                      /*  if ((NeonImagesHandler.getSingleonInstance().getImagesCollectionConditional() == null ||
-                                NeonImagesHandler.getSingleonInstance().getImagesCollectionConditional().size() <= 0) &&
+                      /*  if ((NeonImagesHandler.getSingleonInstance().getImagesCollection() == null ||
+                                NeonImagesHandler.getSingleonInstance().getImagesCollection().size() <= 0) &&
                                 context instanceof NeonNeutralActivity) {
                             ((NeonNeutralActivity) context).onPostResume();
                         }*/
@@ -131,16 +131,16 @@ public class ImageShowAdapter extends BaseDynamicGridAdapter {
             }
         });
 */
-            if (NeonImagesHandler.getSingleonInstance().getImagesCollectionConditional().size() > 0) {
+            if (NeonImagesHandler.getSingleonInstance().getImagesCollection().size() > 0) {
                 RequestOptions options = new RequestOptions()
                         .diskCacheStrategy(DiskCacheStrategy.ALL)
                         .centerCrop()
                         .placeholder(R.drawable.default_placeholder);
-                Glide.with(context).load(NeonImagesHandler.getSingleonInstance().getImagesCollectionConditional().get(position).getFilePath())
+                Glide.with(context).load(NeonImagesHandler.getSingleonInstance().getImagesCollection().get(position).getFilePath())
                         .apply(options)
                         .transition(withCrossFade())
                         .into(holder.image);
-                /*Glide.with(context).load(NeonImagesHandler.getSingleonInstance().getImagesCollectionConditional().get(position).getFilePath())
+                /*Glide.with(context).load(NeonImagesHandler.getSingleonInstance().getImagesCollection().get(position).getFilePath())
                         .crossFade()
                         .placeholder(R.drawable.default_placeholder)
                         .centerCrop()

@@ -156,53 +156,34 @@ public class NormalCameraActivityNeon extends NeonBaseCameraActivity implements 
 
     private void bindCameraFragment() {
         try {
-            askForPermissionIfNeeded(PermissionType.write_external_storage, new OnPermissionResultListener() {
+            askForPermissionIfNeeded(PermissionType.camera, new OnPermissionResultListener() {
                 @Override
                 public void onResult(boolean permissionGranted) {
                     if (permissionGranted) {
-                        try {
-                            askForPermissionIfNeeded(PermissionType.camera, new OnPermissionResultListener() {
-                                @Override
-                                public void onResult(boolean permissionGranted) {
-                                    if (permissionGranted) {
-                                        new Handler().post(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                try {
-                                                    boolean locationRestrictive = true;
-                                                    if (cameraParams != null && cameraParams.getCustomParameters() != null) {
-                                                        locationRestrictive = cameraParams.getCustomParameters().getLocationRestrictive();
-                                                    }
-
-                                                    CameraFragment1 fragment = CameraFragment1.getInstance(locationRestrictive);
-                                                    FragmentManager manager = getSupportFragmentManager();
-                                                    manager.beginTransaction().replace(R.id.content_frame, fragment).commit();
-                                                } catch (Exception e) {
-                                                    e.printStackTrace();
-                                                }
-                                            }
-                                        });
-
-                                    } else {
-                                        if (NeonImagesHandler.getSingletonInstance().isNeutralEnabled()) {
-                                            finish();
-                                        } else {
-                                            NeonImagesHandler.getSingletonInstance().sendImageCollectionAndFinish(NormalCameraActivityNeon.this,
-                                                    ResponseCode.Camera_Permission_Error);
-                                        }
-                                        Toast.makeText(NormalCameraActivityNeon.this, R.string.permission_error, Toast.LENGTH_SHORT).show();
+                        new Handler().post(new Runnable() {
+                            @Override
+                            public void run() {
+                                try {
+                                    boolean locationRestrictive = true;
+                                    if (cameraParams != null && cameraParams.getCustomParameters() != null) {
+                                        locationRestrictive = cameraParams.getCustomParameters().getLocationRestrictive();
                                     }
+
+                                    CameraFragment1 fragment = CameraFragment1.getInstance(locationRestrictive);
+                                    FragmentManager manager = getSupportFragmentManager();
+                                    manager.beginTransaction().replace(R.id.content_frame, fragment).commit();
+                                } catch (Exception e) {
+                                    e.printStackTrace();
                                 }
-                            });
-                        } catch (ManifestPermission manifestPermission) {
-                            manifestPermission.printStackTrace();
-                        }
+                            }
+                        });
+
                     } else {
                         if (NeonImagesHandler.getSingletonInstance().isNeutralEnabled()) {
                             finish();
                         } else {
                             NeonImagesHandler.getSingletonInstance().sendImageCollectionAndFinish(NormalCameraActivityNeon.this,
-                                    ResponseCode.Write_Permission_Error);
+                                    ResponseCode.Camera_Permission_Error);
                         }
                         Toast.makeText(NormalCameraActivityNeon.this, R.string.permission_error, Toast.LENGTH_SHORT).show();
                     }

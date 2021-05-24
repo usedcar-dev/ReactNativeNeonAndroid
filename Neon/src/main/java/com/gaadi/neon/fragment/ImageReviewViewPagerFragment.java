@@ -213,11 +213,7 @@ public class ImageReviewViewPagerFragment extends Fragment implements View.OnCli
                     Toast.makeText(getActivity(), getActivity().getString(R.string.max_tag_count_error, singleModel.getNumberOfPhotos()) + singleModel.getTagName(), Toast.LENGTH_SHORT).show();
                     return;
                 }
-                ImageTagModel tagModel = new ImageTagModel(singleModel.getTagName(), singleModel.getTagId(), singleModel.isMandatory(), singleModel.getNumberOfPhotos());
-                imageModel.setFileTag(tagModel);
-                if (imageModel.getBlurredFileInfo()!=null) {
-                    imageModel.getBlurredFileInfo().setFileTag(tagModel);
-                }
+                imageModel.setFileTag(new ImageTagModel(singleModel.getTagName(), singleModel.getTagId(), singleModel.isMandatory(), singleModel.getNumberOfPhotos()));
                 ImageEditEvent event = new ImageEditEvent();
                 event.setModel(imageModel);
                 ((FragmentListener) getActivity()).getFragmentChanges(event);

@@ -112,7 +112,7 @@ public class NeonNeutralActivity extends NeonBaseNeutralActivity implements View
                     NeonImagesHandler.getSingletonInstance().getGenericParam().getCustomParameters().getTitleName() != null) {
                 setTitle(NeonImagesHandler.getSingletonInstance().getGenericParam().getCustomParameters().getTitleName() + " (" + NeonImagesHandler.getSingletonInstance().getImagesCollection().size() + ")");
             } else {
-                setTitle(getString(R.string.photos_count, NeonImagesHandler.getSingletonInstance().getImagesCollectionConditional().size()));
+                setTitle(getString(R.string.photos_count, NeonImagesHandler.getSingletonInstance().getImagesCollection().size()));
             }
         }
     }

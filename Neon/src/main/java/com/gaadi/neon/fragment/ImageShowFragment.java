@@ -82,12 +82,12 @@ public class ImageShowFragment extends Fragment {
 
             @Override
             public void onDragPositionsChanged(int oldPosition, int newPosition) {
-                if (NeonImagesHandler.getSingletonInstance().getImagesCollectionConditional() == null ||
-                        NeonImagesHandler.getSingletonInstance().getImagesCollectionConditional().size() <= 0) {
+                if (NeonImagesHandler.getSingletonInstance().getImagesCollection() == null ||
+                        NeonImagesHandler.getSingletonInstance().getImagesCollection().size() <= 0) {
                     return;
                 }
-                NeonImagesHandler.getSingletonInstance().getImagesCollectionConditional().add(newPosition,
-                        NeonImagesHandler.getSingletonInstance().getImagesCollectionConditional().remove(oldPosition));
+                NeonImagesHandler.getSingletonInstance().getImagesCollection().add(newPosition,
+                        NeonImagesHandler.getSingletonInstance().getImagesCollection().remove(oldPosition));
 
             }
         });
@@ -98,8 +98,8 @@ public class ImageShowFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        if (NeonImagesHandler.getSingletonInstance().getImagesCollectionConditional() == null ||
-                NeonImagesHandler.getSingletonInstance().getImagesCollectionConditional().size() < 0) {
+        if (NeonImagesHandler.getSingletonInstance().getImagesCollection() == null ||
+                NeonImagesHandler.getSingletonInstance().getImagesCollection().size() < 0) {
             return;
         }
         adapter = new ImageShowAdapter(getActivity(), isProfileTagOnly);

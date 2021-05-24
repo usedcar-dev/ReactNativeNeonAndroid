@@ -23,44 +23,6 @@ public class FileInfo implements Serializable {
     private String latitude;
     private String longitude;
     private String timestamp;
-    private boolean blurred;
-
-    /*reference to blurred file of this image*/
-    private FileInfo blurredFileInfo;
-
-    public FileInfo getBlurredFileInfo() {
-        return blurredFileInfo;
-    }
-
-    public void setBlurredFileInfo(FileInfo blurredFileInfo) {
-        this.blurredFileInfo = blurredFileInfo;
-    }
-
-    public FileInfo getClone(){
-        FileInfo fi = new FileInfo();
-        fi.setFilePath(this.filePath);
-        fi.setType(this.type);
-        fi.setFileName(this.fileName);
-        fi.setDisplayName(this.displayName);
-        fi.setSelected(this.selected);
-        fi.setSource(this.source);
-        fi.setFileCount(this.fileCount);
-        fi.setDateTimeTaken(this.dateTimeTaken);
-        fi.setFileTag(this.fileTag);
-        fi.setLatitude(this.latitude);
-        fi.setLongitude(this.longitude);
-        fi.setTimestamp(this.timestamp);
-        return fi;
-    }
-
-
-    public boolean isBlurred() {
-        return blurred;
-    }
-
-    public void setBlurred(boolean blurred) {
-        this.blurred = blurred;
-    }
 
     public boolean isSelected() {
         return selected;

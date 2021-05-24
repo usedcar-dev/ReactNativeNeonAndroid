@@ -1,6 +1,7 @@
 package com.gaadi.neon.util;
 
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.os.Environment;
 import android.util.Log;
 
@@ -50,14 +51,9 @@ public class Constants {
         if (appName.length() > 0) {
             appName = appName.replace(" ", "");
         }
-        String path;
-        if(folderName != null){
-            path=Environment.getExternalStorageDirectory().getAbsolutePath()+File.separator+appName+File.separator+folderName;
-        }else {
-            path=Environment.getExternalStorageDirectory().getAbsolutePath()+File.separator+appName;
-        }
 
-        File mediaStorageDir = new File(path);
+        ContextWrapper cw = new ContextWrapper(context);
+        File mediaStorageDir = new File(cw.getExternalFilesDir(Environment.DIRECTORY_PICTURES), appName);
 
         // Create the storage directory if it does not exist
         if (!mediaStorageDir.exists()) {
@@ -70,7 +66,7 @@ public class Constants {
         File mediaFile;
 
         if (type == TYPE_IMAGE) {
-            mediaFile = new File(mediaStorageDir.getPath() + File.separator +
+            mediaFile = new File(mediaStorageDir,
                     "IMG_" + System.currentTimeMillis() + ".jpg");
         } else
             return null;
