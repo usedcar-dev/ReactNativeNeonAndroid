@@ -82,6 +82,7 @@ public class NormalCameraActivityNeon extends NeonBaseCameraActivity implements 
     private CSOpenAPI camScannerApi;
     private boolean isPreviewVisible;
     private String filePathToReview;
+    private CameraFragment1 fragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -113,8 +114,8 @@ public class NormalCameraActivityNeon extends NeonBaseCameraActivity implements 
         } else {
             buttonDone.setVisibility(View.VISIBLE);
         }
-        customize();
         bindCameraFragment();
+        customize();
 
         locationTracker = new LocationHelper(NormalCameraActivityNeon.this);
         locationTracker.setLocationListener(this);
@@ -169,7 +170,7 @@ public class NormalCameraActivityNeon extends NeonBaseCameraActivity implements 
                                         locationRestrictive = cameraParams.getCustomParameters().getLocationRestrictive();
                                     }
 
-                                    CameraFragment1 fragment = CameraFragment1.getInstance(locationRestrictive);
+                                    fragment = CameraFragment1.getInstance(locationRestrictive);
                                     FragmentManager manager = getSupportFragmentManager();
                                     manager.beginTransaction().replace(R.id.content_frame, fragment).commit();
                                 } catch (Exception e) {
@@ -395,7 +396,19 @@ public class NormalCameraActivityNeon extends NeonBaseCameraActivity implements 
         return tagModels.get(currentTag);
     }
 
-    public void setTag(ImageTagModel imageTagModel, boolean rightToLeft) {
+    public void setTag(final ImageTagModel imageTagModel, boolean rightToLeft) {
+        if (fragment != null) {
+            fragment.setMask(imageTagModel.getMaskUrl());
+        }else{
+            // fragment has not attached yet to this activity (for 1st image) so wait for 1.5 sec so that overlay for the first tag is set properly
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    fragment.setMask(imageTagModel.getMaskUrl());
+                }
+            },1500);
+        }
+
         // need to update both view and internal data @ the same time, animation may delay this.
         String tag = imageTagModel.isMandatory() ? "*" + imageTagModel.getTagName() : imageTagModel.getTagName();
         tvTag.setText(tag);

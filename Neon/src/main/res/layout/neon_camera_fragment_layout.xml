@@ -109,4 +109,12 @@
         android:contentDescription="@null"
         android:src="@drawable/ic_camera" />
 
+
+    <ImageView android:id="@+id/maskImg"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_centerInParent="true"
+        android:padding="10dp"/>
+
+
 </RelativeLayout>

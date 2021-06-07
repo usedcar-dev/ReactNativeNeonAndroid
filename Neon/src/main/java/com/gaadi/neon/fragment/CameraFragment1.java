@@ -30,6 +30,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -42,6 +43,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.gaadi.neon.activity.ImageReviewActivity;
 import com.gaadi.neon.adapter.FlashModeRecyclerHorizontalAdapter;
 import com.gaadi.neon.enumerations.CameraFacing;
@@ -100,6 +102,8 @@ public class CameraFragment1 extends Fragment implements View.OnTouchListener, C
     private float last_x, last_y, last_z;
     private LinearLayout llFlash;
     private ImageView buttonCaptureHorizontal, buttonCaptureVertical;
+    private ImageView maskImg;
+
     SensorEventListener sensorEventListener = new SensorEventListener() {
         @Override
         public void onSensorChanged(SensorEvent event) {
@@ -203,6 +207,8 @@ public class CameraFragment1 extends Fragment implements View.OnTouchListener, C
         mCameraLayout = rootView.findViewById(R.id.camera_preview);
         buttonCaptureHorizontal = rootView.findViewById(R.id.buttonCaptureHorizontal);
         buttonCaptureVertical = rootView.findViewById(R.id.buttonCaptureVertical);
+        maskImg = rootView.findViewById(R.id.maskImg);
+
         currentFlashMode.setOnClickListener(this);
         buttonCaptureVertical.setOnClickListener(this);
         buttonCaptureHorizontal.setOnClickListener(this);
@@ -229,6 +235,15 @@ public class CameraFragment1 extends Fragment implements View.OnTouchListener, C
         }
 
     }
+
+    public void setMask(String maskUrl) {
+        if(!TextUtils.isEmpty(maskUrl) && isAdded()){
+            Glide.with(this)
+                    .load(maskUrl)
+                    .into(maskImg);
+        }
+    }
+
 
     public void onClick(View v) {
         if (v.getId() == R.id.buttonCaptureVertical || v.getId() == R.id.buttonCaptureHorizontal) {
