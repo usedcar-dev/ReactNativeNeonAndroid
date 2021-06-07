@@ -237,10 +237,15 @@ public class CameraFragment1 extends Fragment implements View.OnTouchListener, C
     }
 
     public void setMask(String maskUrl) {
-        if(!TextUtils.isEmpty(maskUrl) && isAdded()){
-            Glide.with(this)
-                    .load(maskUrl)
-                    .into(maskImg);
+        if(isAdded()){
+            if(!TextUtils.isEmpty(maskUrl)){
+                Glide.with(this)
+                        .load(maskUrl)
+                        .into(maskImg);
+            }else{
+                Glide.with(this)
+                        .clear(maskImg);
+            }
         }
     }
 
