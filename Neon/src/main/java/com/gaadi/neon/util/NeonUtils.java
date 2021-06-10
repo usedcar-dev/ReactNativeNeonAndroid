@@ -3,7 +3,9 @@ package com.gaadi.neon.util;
 import android.app.Activity;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.ContentResolver;
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -621,8 +623,7 @@ public class NeonUtils {
 
     }
 
-    public static void copyFile(String sourcePath, File destFile) {
-        File sourceFile = new File(sourcePath);
+    public static void copyFile(Context context,String sourcePath, File destFile) {
 
         if (!destFile.exists()) {
             try {
@@ -632,38 +633,25 @@ public class NeonUtils {
             }
         }
 
-        FileChannel source = null;
-        FileChannel destination = null;
-
+        FileOutputStream destinationOutputStream = null;
+        Bitmap bitmap = null;
         try {
-
-            /**
-             * getChannel() returns unique FileChannel object associated a file
-             * output stream.
-             */
-            source = new FileInputStream(sourceFile).getChannel();
-
-            destination = new FileOutputStream(destFile).getChannel();
-
-            if (destination != null && source != null) {
-                destination.transferFrom(source, 0, source.size());
-            }
+            ContentResolver contentResolver = context.getContentResolver();
+            bitmap = MediaStore.Images.Media.getBitmap(contentResolver,Uri.parse(sourcePath));
+            destinationOutputStream = new FileOutputStream(destFile);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, destinationOutputStream);
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
-            if (source != null) {
-                try {
-                    source.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+            if(bitmap!=null && !bitmap.isRecycled()){
+                bitmap.recycle();
             }
-            if (destination != null) {
+            if(destinationOutputStream != null ){
                 try {
-                    destination.close();
+                    destinationOutputStream.close();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -679,7 +667,9 @@ public class NeonUtils {
         if (appName.length() > 0) {
             appName = appName.replace(" ", "");
         }
-        String path = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + appName + File.separator + folderName;
+
+        ContextWrapper cw = new ContextWrapper(context);
+        String path = cw.getExternalFilesDir(Environment.DIRECTORY_PICTURES) + File.separator + appName + File.separator + folderName;
 
         String pathForCheck = path + File.separator + imageName;
 

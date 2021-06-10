@@ -1,7 +1,9 @@
 package com.gaadi.neon.activity.gallery;
 
+import android.content.ContentUris;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.provider.MediaStore;
 import android.widget.Toast;
 
@@ -26,10 +28,18 @@ public abstract class NeonBaseGalleryActivity extends NeonBaseActivity {
     protected ArrayList<BucketModel> getImageBuckets() {
         buckets = new ArrayList<>();
 
-        String[] PROJECTION_BUCKET = {MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME,
-                MediaStore.Images.ImageColumns.BUCKET_ID, MediaStore.Images.ImageColumns.DATA};
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            uri = MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL);
+        } else {
+            uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+        }
 
-        String orderBy = MediaStore.Images.ImageColumns.DATE_TAKEN + " DESC";
+        String[] PROJECTION_BUCKET = {
+                MediaStore.Images.Media._ID,
+                MediaStore.Images.Media.BUCKET_DISPLAY_NAME,
+                MediaStore.Images.Media.BUCKET_ID, MediaStore.Images.ImageColumns.DATA};
+
+        String orderBy = MediaStore.Images.Media.DATE_TAKEN + " DESC";
 
         Cursor mCursor;
         if (NeonImagesHandler.getSingletonInstance().getGalleryParam() != null && NeonImagesHandler.getSingletonInstance().getGalleryParam().isRestrictedExtensionJpgPngEnabled()) {
@@ -42,20 +52,29 @@ public abstract class NeonBaseGalleryActivity extends NeonBaseActivity {
             finish();
             return null;
         }
+
+        int idColumn = mCursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID);
         mCursor.moveToFirst();
 
 
         if(mCursor.getCount() > 0){
             do {
-                String bucketId = mCursor.getString(mCursor.getColumnIndex(MediaStore.Images.ImageColumns.BUCKET_ID));
+                String bucketId = mCursor.getString(mCursor.getColumnIndex(MediaStore.Images.Media.BUCKET_ID));
 
                 int index = getBucketIndexWithId(bucketId);
                 if (index == -1) {
+                    long id = mCursor.getLong(idColumn);
                     BucketModel bucketModel = new BucketModel();
                     bucketModel.setBucketId(bucketId);
-                    bucketModel.setBucketName(mCursor.getString(mCursor.getColumnIndex(MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME)));
+                    bucketModel.setBucketName(mCursor.getString(mCursor.getColumnIndex(MediaStore.Images.Media.BUCKET_DISPLAY_NAME)));
                     bucketModel.setFileCount(1);
-                    bucketModel.setBucketCoverImagePath(mCursor.getString(mCursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA)));
+
+                    //bucketModel.setBucketCoverImagePath(mCursor.getString(mCursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA)));
+
+                    Uri contentUri = ContentUris.withAppendedId(
+                            MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id);
+                    bucketModel.setBucketCoverImagePath(contentUri.toString());
+
                     buckets.add(bucketModel);
                 } else {
                     buckets.get(index).setFileCount(buckets.get(index).getFileCount() + 1);
@@ -71,11 +90,13 @@ public abstract class NeonBaseGalleryActivity extends NeonBaseActivity {
     protected ArrayList<FileInfo> getFileFromBucketId(String bucketId) {
         ArrayList<FileInfo> fileInfos = new ArrayList<>();
 
-        String[] PROJECTION_FILES = {MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME,
-                MediaStore.Images.ImageColumns.BUCKET_ID, MediaStore.Images.ImageColumns.DATA,
-                MediaStore.Images.ImageColumns.DATE_TAKEN};
+        String[] PROJECTION_FILES = {
+                MediaStore.Images.Media._ID,
+                MediaStore.Images.Media.BUCKET_ID,
+                MediaStore.Images.Media.DATE_TAKEN, MediaStore.Images.Media.DATA,
+                MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME};
 
-        String orderBy = MediaStore.Images.ImageColumns.DATE_TAKEN + " DESC";
+        String orderBy = MediaStore.Images.Media.DATE_TAKEN + " DESC";
 
         String selection = MediaStore.Images.Media.BUCKET_ID + " =? and " + MediaStore.Images.Media.SIZE + " >? and "
                 + MediaStore.Images.Media.MIME_TYPE + " in (?, ?)";
@@ -90,15 +111,24 @@ public abstract class NeonBaseGalleryActivity extends NeonBaseActivity {
             finish();
             return null;
         }
+
+        int idColumn = mCursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID);
+
         mCursor.moveToFirst();
 
         if(mCursor.getCount()>0){
             do{
+                long id = mCursor.getLong(idColumn);
                 FileInfo singleFileInfo = new FileInfo();
                 singleFileInfo.setSource(FileInfo.SOURCE.PHONE_GALLERY);
-                singleFileInfo.setFilePath(mCursor.getString(mCursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA)));
-                singleFileInfo.setDateTimeTaken(mCursor.getString(mCursor.getColumnIndex(MediaStore.Images.ImageColumns.DATE_TAKEN)));
+                singleFileInfo.setDateTimeTaken(mCursor.getString(mCursor.getColumnIndex(MediaStore.Images.Media.DATE_TAKEN)));
                 singleFileInfo.setType(FileInfo.FILE_TYPE.IMAGE);
+
+                //singleFileInfo.setFilePath(mCursor.getString(mCursor.getColumnIndex(MediaStore.Images.Media.DATA)));
+
+                Uri contentUri = ContentUris.withAppendedId(
+                        MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id);
+                singleFileInfo.setFilePath(contentUri.toString());
                 fileInfos.add(singleFileInfo);
             }while (mCursor.moveToNext());
         }
