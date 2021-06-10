@@ -710,4 +710,10 @@ public class NormalCameraActivityNeon extends NeonBaseCameraActivity implements 
     public void onLocationChanged(Location location) {
         this.location = location;
     }
+
+    @Override
+    protected void onUserLeaveHint() {
+        super.onUserLeaveHint();
+        onBackPressed();
+    }
 }
