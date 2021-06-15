@@ -42,6 +42,7 @@
     <string name="no_image_selected">No image selected</string>
     <string name="max_count_error">%1$d images are allowed only</string>
     <string name="max_tag_count_error">%1$d images are allowed only for </string>
+    <string name="gallery_image_editing_error">Please edit this photo directly from phone gallery. In-app gallery image editing will be available soon.</string>
 
     <string name="selected_max_photos">Maximum no of photos selected already</string>
     <string name="click_photo">Please click atleast one photo</string>

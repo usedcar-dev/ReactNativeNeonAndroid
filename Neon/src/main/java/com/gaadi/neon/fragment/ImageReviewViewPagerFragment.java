@@ -10,10 +10,8 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.media.ExifInterface;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.FileProvider;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -38,15 +36,12 @@ import com.gaadi.neon.model.ImageTagModel;
 import com.gaadi.neon.util.Constants;
 import com.gaadi.neon.util.FileInfo;
 import com.gaadi.neon.util.NeonImagesHandler;
-import com.gaadi.neon.util.NeonUtils;
 import com.scanlibrary.R;
 import com.soundcloud.android.crop.Crop;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-
-import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade;
 
 /**
  * @author dipanshugarg
@@ -247,20 +242,22 @@ public class ImageReviewViewPagerFragment extends Fragment implements View.OnCli
             event.setPosition(mPageNumber);
             warnDeleteDialog(event);
         } else if (v.getId() == R.id.imagereview_rotatebtn) {
-            rotateImage(imageModel.getFilePath());
+            Toast.makeText(getActivity(), getActivity().getString(R.string.gallery_image_editing_error), Toast.LENGTH_SHORT).show();
+//            rotateImage(imageModel.getFilePath());
         } else if (v.getId() == R.id.imagereview_tag_spinner) {
             showTagsDropDown(v);
         } else if (v.getId() == R.id.imagereview_cropbtn) {
-            try {
-                cropFilePath = NeonUtils.getEmptyStoragePath(getActivity());
-                //Uri inputUri = Uri.fromFile(new File(imageModel.getFilePath()));
-                //Uri outputUri = Uri.fromFile(cropFilePath);
-                Uri inputUri = FileProvider.getUriForFile(getActivity(), NeonUtils.getFileProviderAuthority(getActivity()), new File(imageModel.getFilePath()));
-                Uri outputUri = FileProvider.getUriForFile(getActivity(), NeonUtils.getFileProviderAuthority(getActivity()), cropFilePath);
-                Crop.of(inputUri, outputUri).start(getActivity(), ImageReviewViewPagerFragment.this);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            Toast.makeText(getActivity(), getActivity().getString(R.string.gallery_image_editing_error), Toast.LENGTH_SHORT).show();
+//            try {
+//                cropFilePath = NeonUtils.getEmptyStoragePath(getActivity());
+//                //Uri inputUri = Uri.fromFile(new File(imageModel.getFilePath()));
+//                //Uri outputUri = Uri.fromFile(cropFilePath);
+//                Uri inputUri = FileProvider.getUriForFile(getActivity(), NeonUtils.getFileProviderAuthority(getActivity()), new File(imageModel.getFilePath()));
+//                Uri outputUri = FileProvider.getUriForFile(getActivity(), NeonUtils.getFileProviderAuthority(getActivity()), cropFilePath);
+//                Crop.of(inputUri, outputUri).start(getActivity(), ImageReviewViewPagerFragment.this);
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
         }
     }
 
