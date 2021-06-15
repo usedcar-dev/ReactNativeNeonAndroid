@@ -1,5 +1,6 @@
 package com.gaadi.neon.activity.camera;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -10,6 +11,7 @@ import android.location.Location;
 import android.media.ThumbnailUtils;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.text.TextUtils;
@@ -128,9 +130,7 @@ public class NormalCameraActivityNeon extends NeonBaseCameraActivity implements 
         if (NeonImagesHandler.getSingletonInstance().getLivePhotosListener() != null) {
             NeonImagesHandler.getSingletonInstance().setLivePhotoNextTagListener(this);
         }
-        if (cameraParams == null || cameraParams.getCustomParameters() == null || cameraParams.getCustomParameters().getLocationRestrictive()) {
-            locationTracker.getLocation();
-        }
+        askPermission();
         showTagImages();
     }
 
@@ -147,8 +147,10 @@ public class NormalCameraActivityNeon extends NeonBaseCameraActivity implements 
     }
 
     private void initializeOverlay(){
-        ImageTagModel singleTagModel = tagModels.get(currentTag);
-        setTag(singleTagModel,true);
+        if (null != tagModels) {
+            ImageTagModel singleTagModel = tagModels.get(currentTag);
+            setTag(singleTagModel, true);
+        }
     }
 
     @Override
@@ -182,28 +184,38 @@ public class NormalCameraActivityNeon extends NeonBaseCameraActivity implements 
     }
 
     private void bindCameraFragment() {
+        int permissionState = ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
+        if (permissionState == PackageManager.PERMISSION_GRANTED) {
+            new Handler().post(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        boolean locationRestrictive = true;
+                        if (cameraParams != null && cameraParams.getCustomParameters() != null) {
+                            locationRestrictive = cameraParams.getCustomParameters().getLocationRestrictive();
+                        }
+
+                        fragment = CameraFragment1.getInstance(locationRestrictive);
+                        FragmentManager manager = getSupportFragmentManager();
+                        manager.beginTransaction().replace(R.id.content_frame, fragment).commit();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+        }
+    }
+
+    private void askPermission() {
         try {
             askForPermissionIfNeeded(PermissionType.camera, new OnPermissionResultListener() {
                 @Override
                 public void onResult(boolean permissionGranted) {
                     if (permissionGranted) {
-                        new Handler().post(new Runnable() {
-                            @Override
-                            public void run() {
-                                try {
-                                    boolean locationRestrictive = true;
-                                    if (cameraParams != null && cameraParams.getCustomParameters() != null) {
-                                        locationRestrictive = cameraParams.getCustomParameters().getLocationRestrictive();
-                                    }
-
-                                    fragment = CameraFragment1.getInstance(locationRestrictive);
-                                    FragmentManager manager = getSupportFragmentManager();
-                                    manager.beginTransaction().replace(R.id.content_frame, fragment).commit();
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                        });
+                        if (cameraParams == null || cameraParams.getCustomParameters() == null || cameraParams.getCustomParameters().getLocationRestrictive()) {
+                            locationTracker.getLocation();
+                        }
+                        bindCameraFragment();
 
                     } else {
                         if (NeonImagesHandler.getSingletonInstance().isNeutralEnabled()) {
