@@ -10,6 +10,7 @@ import android.location.Location;
 import android.media.ThumbnailUtils;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.text.TextUtils;
 import android.util.Log;
@@ -114,7 +115,7 @@ public class NormalCameraActivityNeon extends NeonBaseCameraActivity implements 
         } else {
             buttonDone.setVisibility(View.VISIBLE);
         }
-        bindCameraFragment();
+//        bindCameraFragment();
         customize();
 
         locationTracker = new LocationHelper(NormalCameraActivityNeon.this);
@@ -131,6 +132,31 @@ public class NormalCameraActivityNeon extends NeonBaseCameraActivity implements 
             locationTracker.getLocation();
         }
         showTagImages();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        bindCameraFragment();
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                initializeOverlay();
+            }
+        }, 1500);
+    }
+
+    private void initializeOverlay(){
+        ImageTagModel singleTagModel = tagModels.get(currentTag);
+        setTag(singleTagModel,true);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        for (Fragment fragment : getSupportFragmentManager().getFragments()) {
+            getSupportFragmentManager().beginTransaction().remove(fragment).commit();
+        }
     }
 
 
@@ -399,16 +425,7 @@ public class NormalCameraActivityNeon extends NeonBaseCameraActivity implements 
     public void setTag(final ImageTagModel imageTagModel, boolean rightToLeft) {
         if (fragment != null) {
             fragment.setMask(imageTagModel.getMaskUrl());
-        }else{
-            // fragment has not attached yet to this activity (for 1st image) so wait for 1.5 sec so that overlay for the first tag is set properly
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    fragment.setMask(imageTagModel.getMaskUrl());
-                }
-            },1500);
         }
-
         // need to update both view and internal data @ the same time, animation may delay this.
         String tag = imageTagModel.isMandatory() ? "*" + imageTagModel.getTagName() : imageTagModel.getTagName();
         tvTag.setText(tag);
@@ -711,9 +728,4 @@ public class NormalCameraActivityNeon extends NeonBaseCameraActivity implements 
         this.location = location;
     }
 
-    @Override
-    protected void onUserLeaveHint() {
-        super.onUserLeaveHint();
-        onBackPressed();
-    }
 }
