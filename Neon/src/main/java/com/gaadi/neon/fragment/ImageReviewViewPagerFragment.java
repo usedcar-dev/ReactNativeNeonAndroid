@@ -242,12 +242,19 @@ public class ImageReviewViewPagerFragment extends Fragment implements View.OnCli
             event.setPosition(mPageNumber);
             warnDeleteDialog(event);
         } else if (v.getId() == R.id.imagereview_rotatebtn) {
-            Toast.makeText(getActivity(), getActivity().getString(R.string.gallery_image_editing_error), Toast.LENGTH_SHORT).show();
-//            rotateImage(imageModel.getFilePath());
+            if (imageModel.getSource() == FileInfo.SOURCE.PHONE_CAMERA) {
+                rotateImage(imageModel.getFilePath());
+            } else {
+                Toast.makeText(getActivity(), getActivity().getString(R.string.gallery_image_editing_error), Toast.LENGTH_SHORT).show();
+            }
         } else if (v.getId() == R.id.imagereview_tag_spinner) {
             showTagsDropDown(v);
         } else if (v.getId() == R.id.imagereview_cropbtn) {
-            Toast.makeText(getActivity(), getActivity().getString(R.string.gallery_image_editing_error), Toast.LENGTH_SHORT).show();
+            if (imageModel.getSource() == FileInfo.SOURCE.PHONE_CAMERA) {
+                Toast.makeText(getActivity(), getActivity().getString(R.string.coming_soon), Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(getActivity(), getActivity().getString(R.string.gallery_image_editing_error), Toast.LENGTH_SHORT).show();
+            }
 //            try {
 //                cropFilePath = NeonUtils.getEmptyStoragePath(getActivity());
 //                //Uri inputUri = Uri.fromFile(new File(imageModel.getFilePath()));
