@@ -6,11 +6,14 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.media.ExifInterface;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.OpenableColumns;
 import android.support.v4.app.Fragment;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -40,7 +43,9 @@ import com.scanlibrary.R;
 import com.soundcloud.android.crop.Crop;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
 /**
@@ -244,8 +249,10 @@ public class ImageReviewViewPagerFragment extends Fragment implements View.OnCli
         } else if (v.getId() == R.id.imagereview_rotatebtn) {
             if (imageModel.getSource() == FileInfo.SOURCE.PHONE_CAMERA) {
                 rotateImage(imageModel.getFilePath());
-            } else {
-                Toast.makeText(getActivity(), getActivity().getString(R.string.gallery_image_editing_error), Toast.LENGTH_SHORT).show();
+            } else
+            {
+                String filePath = copyFileToInternalStorage(Uri.parse(imageModel.getFilePath()), "Evaluator");
+                rotateImage(filePath);
             }
         } else if (v.getId() == R.id.imagereview_tag_spinner) {
             showTagsDropDown(v);
@@ -371,23 +378,93 @@ public class ImageReviewViewPagerFragment extends Fragment implements View.OnCli
         } else if (orientation == ExifInterface.ORIENTATION_ROTATE_270) {
             exifInterface.setAttribute(ExifInterface.TAG_ORIENTATION, "" + ExifInterface.ORIENTATION_NORMAL);
         }
-        try {
+        try
+        {
             exifInterface.saveAttributes();
-        } catch (IOException e) {
+        }
+        catch(IOException e)
+        {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
         getBitmap(path);
+    }
 
+    private String copyFileToInternalStorage(Uri uri, String newDirName)
+    {
+        Uri returnUri = uri;
+
+        Cursor returnCursor = mContext.getContentResolver()
+                .query(returnUri, new String[]{OpenableColumns.DISPLAY_NAME, OpenableColumns.SIZE}, null, null, null);
+        if(returnCursor == null)
+        {
+            return null;
+        }
+
+        try
+        {
+            if(returnCursor.moveToFirst())
+            {
+                int nameIndex = returnCursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
+                int sizeIndex = returnCursor.getColumnIndex(OpenableColumns.SIZE);
+                returnCursor.moveToFirst();
+                String name = (returnCursor.getString(nameIndex));
+                String size = (Long.toString(returnCursor.getLong(sizeIndex)));
+
+                File output;
+                if(!newDirName.equals(""))
+                {
+                    File dir = new File(mContext.getFilesDir() + "/" + newDirName);
+                    if(!dir.exists())
+                    {
+                        dir.mkdir();
+                    }
+                    output = new File(mContext.getFilesDir() + "/" + newDirName + "/" + name);
+                }
+                else
+                {
+                    output = new File(mContext.getFilesDir() + "/" + name);
+                }
+                try
+                {
+                    InputStream inputStream = mContext.getContentResolver().openInputStream(uri);
+                    FileOutputStream outputStream = new FileOutputStream(output);
+                    int read = 0;
+                    int bufferSize = 1024;
+                    final byte[] buffers = new byte[bufferSize];
+                    while((read = inputStream.read(buffers)) != -1)
+                    {
+                        outputStream.write(buffers, 0, read);
+                    }
+
+                    inputStream.close();
+                    outputStream.close();
+                }
+                catch(Exception e)
+                {
+
+                    Log.e("Exception", e.getMessage());
+                }
+
+                return output.getPath();
+            }
+        }
+        finally
+        {
+            returnCursor.close();
+        }
+        return null;
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent result) {
-        if (requestCode == Crop.REQUEST_CROP && resultCode == Activity.RESULT_OK) {
-            if (cropFilePath != null) {
+    public void onActivityResult(int requestCode, int resultCode, Intent result)
+    {
+        if(requestCode == Crop.REQUEST_CROP && resultCode == Activity.RESULT_OK)
+        {
+            if(cropFilePath != null)
+            {
                 imageModel.setFilePath(cropFilePath.getAbsolutePath());
-                RequestOptions options = new RequestOptions()
-                        .diskCacheStrategy(DiskCacheStrategy.NONE)
+                RequestOptions options = new RequestOptions().diskCacheStrategy(DiskCacheStrategy.NONE)
                         .skipMemoryCache(true)
                         .placeholder(R.drawable.default_placeholder);
                 Glide.with(this).load(imageModel.getFilePath())
