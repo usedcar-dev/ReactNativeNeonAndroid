@@ -3,9 +3,6 @@ package com.gaadi.neon.activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentManager;
 import android.util.Log;
 
 import com.gaadi.neon.fragment.NeutralFragment;
@@ -14,11 +11,14 @@ import com.gaadi.neon.util.Constants;
 import com.gaadi.neon.util.PhotoParams;
 import com.scanlibrary.R;
 
+import androidx.annotation.NonNull;
+import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
+
 /**
- *  @author lakshaygirdhar
- *  @version 1.0
- *  @since 13-08-2016
- *
+ * @author lakshaygirdhar
+ * @version 1.0
+ * @since 13-08-2016
  */
 
 public class LNeutralActivity extends FragmentActivity
@@ -61,18 +61,22 @@ public class LNeutralActivity extends FragmentActivity
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode,
+                                           @NonNull
+                                                   String[] permissions,
+                                           @NonNull
+                                                   int[] grantResults)
+    {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == Constants.REQUEST_PERMISSION_CAMERA) {
-            if (grantResults.length > 1
-                    && (grantResults[0] != PackageManager.PERMISSION_GRANTED
-                            || grantResults[1] != PackageManager.PERMISSION_GRANTED)) {
+        if(requestCode == Constants.REQUEST_PERMISSION_CAMERA)
+        {
+            if(grantResults.length > 1 && (grantResults[0] != PackageManager.PERMISSION_GRANTED || grantResults[1] != PackageManager.PERMISSION_GRANTED))
+            {
                 return;
             }
-            if (grantResults.length > 0
-                    && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                cameraItemsFragment.onActivityResult(requestCode,
-                        RESULT_OK, null);
+            if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+            {
+                cameraItemsFragment.onActivityResult(requestCode, RESULT_OK, null);
             }
         } else if (requestCode == Constants.REQUEST_PERMISSION_READ_EXTERNAL_STORAGE) {
             if (grantResults.length > 0

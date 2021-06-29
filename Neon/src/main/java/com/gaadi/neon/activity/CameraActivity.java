@@ -2,8 +2,6 @@ package com.gaadi.neon.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.FragmentManager;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -18,6 +16,9 @@ import com.scanlibrary.R;
 
 import java.io.File;
 import java.util.ArrayList;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentManager;
 /**
  * @author lakshaygirdhar
  * @version 1.0

@@ -6,8 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,13 +30,16 @@ import com.scanlibrary.R;
 
 import java.util.ArrayList;
 
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+
 /**
  * Created by Lakshay
  *
  * @since 13-02-2015
  */
-public class NeutralFragment extends Fragment implements View.OnClickListener, UpdateSelection,
-        AdapterView.OnItemClickListener {
+public class NeutralFragment extends Fragment implements View.OnClickListener, UpdateSelection, AdapterView.OnItemClickListener
+{
     public static final String ADD_PHOTOS = "addPhotos";
     public static final String UPDATE_GRID = "update_grid";
     public static final String IMG_LOAD_DEF_BIG = "IMG_LOAD_DEF_BIG";

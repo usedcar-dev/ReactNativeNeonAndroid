@@ -1,33 +1,30 @@
 package com.gaadi.neon.activity;
 
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.FrameLayout;
 
-import com.gaadi.neon.model.ImageTagModel;
-import com.gaadi.neon.util.FileInfo;
 import com.scanlibrary.R;
 
-import java.util.HashMap;
-import java.util.List;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 /**
  * @author lakshaygirdhar
- * @since 13-08-2016
  * @version 1.0
- *
+ * @since 13-08-2016
  */
 
-public abstract class BaseActivity extends AppCompatActivity {
+public abstract class BaseActivity extends AppCompatActivity
+{
 
     protected FrameLayout frameLayout;
     protected Toolbar toolbar;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_base);
         frameLayout = (FrameLayout) findViewById(R.id.content_frame);

@@ -2,33 +2,30 @@ package com.gaadi.neon.fragment;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.Toast;
 
 import com.gaadi.neon.activity.ImageReviewActivity;
+import com.gaadi.neon.adapter.ImageShowAdapter;
 import com.gaadi.neon.dynamicgrid.DynamicGridView;
 import com.gaadi.neon.enumerations.ResponseCode;
-import com.gaadi.neon.adapter.ImageShowAdapter;
 import com.gaadi.neon.interfaces.INeutralParam;
-import com.gaadi.neon.model.ImageTagModel;
 import com.gaadi.neon.util.Constants;
-import com.gaadi.neon.util.FileInfo;
 import com.gaadi.neon.util.NeonImagesHandler;
 import com.scanlibrary.R;
 
-import java.util.List;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 
 /**
  * @author princebatra
  * @version 1.0
  * @since 2/2/17
  */
-public class ImageShowFragment extends Fragment {
+public class ImageShowFragment extends Fragment
+{
 
     ImageShowAdapter adapter;
     private boolean isProfileTagOnly;
@@ -36,16 +33,22 @@ public class ImageShowFragment extends Fragment {
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater,
+                             @Nullable
+                                     ViewGroup container,
+                             @Nullable
+                                     Bundle savedInstanceState)
+    {
         INeutralParam iNeutralParam = NeonImagesHandler.getSingletonInstance().getNeutralParam();
-        if (iNeutralParam != null) {
+        if(iNeutralParam != null)
+        {
             isProfileTagOnly = iNeutralParam.hasOnlyProfileTag();
         }
-        ViewGroup rootView = (ViewGroup) inflater
-                .inflate(R.layout.image_show_layout, container, false);
+        ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.image_show_layout, container, false);
         rootView.findViewById(R.id.btnDone).setOnClickListener(doneListener);
         imageShowGrid = rootView.findViewById(R.id.image_show_grid);
-        imageShowGrid.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        imageShowGrid.setOnItemClickListener(new AdapterView.OnItemClickListener()
+        {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
                 if (NeonImagesHandler.getSingletonInstance() != null &&

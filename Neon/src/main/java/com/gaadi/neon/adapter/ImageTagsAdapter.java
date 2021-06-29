@@ -2,7 +2,6 @@ package com.gaadi.neon.adapter;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.support.v4.content.ContextCompat;
 import android.text.Spannable;
 import android.text.style.ForegroundColorSpan;
 import android.view.LayoutInflater;
@@ -17,6 +16,7 @@ import com.gaadi.neon.util.FileInfo;
 import com.gaadi.neon.util.NeonImagesHandler;
 import com.scanlibrary.R;
 
+import androidx.core.content.ContextCompat;
 
 /**
  * Created by alokmishra on 27/11/15.
@@ -76,7 +76,7 @@ public class ImageTagsAdapter extends ArrayAdapter<ImageTagModel> {
 
         }
         if(NeonImagesHandler.getSingletonInstance().checkImagesAvailableForTag(tagsModel)){
-            convertView.setBackgroundColor( ContextCompat.getColor(context, android.R.color.darker_gray));
+            convertView.setBackgroundColor(ContextCompat.getColor(context, android.R.color.darker_gray));
         }else{
             convertView.setBackgroundColor( ContextCompat.getColor(context, android.R.color.transparent));
         }

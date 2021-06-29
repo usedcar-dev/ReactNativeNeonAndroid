@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.media.ExifInterface;
-import android.support.v7.app.AlertDialog;
 import android.widget.Toast;
 
 import com.gaadi.neon.enumerations.LibraryMode;
@@ -26,12 +25,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import androidx.appcompat.app.AlertDialog;
+
 /**
  * @author princebatra
  * @version 1.0
  * @since 1/2/17
  */
-public class NeonImagesHandler {
+public class NeonImagesHandler
+{
 
     private static NeonImagesHandler singleonInstance;
     private boolean clearInstance;

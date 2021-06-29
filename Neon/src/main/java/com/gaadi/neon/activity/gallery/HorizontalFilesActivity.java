@@ -3,10 +3,6 @@ package com.gaadi.neon.activity.gallery;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
@@ -15,12 +11,12 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
-import com.gaadi.neon.enumerations.CameraFacing;
-import com.gaadi.neon.enumerations.CameraOrientation;
-import com.gaadi.neon.enumerations.CameraType;
 import com.gaadi.neon.PhotosLibrary;
 import com.gaadi.neon.activity.ImageShow;
 import com.gaadi.neon.adapter.GalleryHoriontalAdapter;
+import com.gaadi.neon.enumerations.CameraFacing;
+import com.gaadi.neon.enumerations.CameraOrientation;
+import com.gaadi.neon.enumerations.CameraType;
 import com.gaadi.neon.enumerations.ResponseCode;
 import com.gaadi.neon.interfaces.ICameraParam;
 import com.gaadi.neon.interfaces.OnImageClickListener;
@@ -32,12 +28,17 @@ import com.gaadi.neon.util.CustomParameters;
 import com.gaadi.neon.util.FileInfo;
 import com.gaadi.neon.util.ManifestPermission;
 import com.gaadi.neon.util.NeonException;
-import com.gaadi.neon.util.PermissionType;
 import com.gaadi.neon.util.NeonImagesHandler;
+import com.gaadi.neon.util.PermissionType;
 import com.scanlibrary.R;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade;
 
@@ -52,15 +53,18 @@ public class HorizontalFilesActivity extends NeonBaseGalleryActivity implements 
     List<FileInfo> recentelyImageCollection;
     private ImageView fullScreenImage;
 
-
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
+    protected void onCreate(
+            @Nullable
+                    Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
         getLayoutInflater().inflate(R.layout.horizontal_gallery_layout, frameLayout);
         recentelyImageCollection = new ArrayList<>();
         bindXml();
         String title = getIntent().getStringExtra(Constants.BucketName);
-        if (title == null || title.length() <= 0) {
+        if(title == null || title.length() <= 0)
+        {
             title = getString(R.string.gallery);
         }
         setTitle(title);

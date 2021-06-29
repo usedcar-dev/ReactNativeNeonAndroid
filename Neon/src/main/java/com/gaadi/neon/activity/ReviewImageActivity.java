@@ -5,11 +5,6 @@ import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.content.FileProvider;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
@@ -25,11 +20,18 @@ import com.scanlibrary.R;
 
 import java.io.File;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
+import androidx.fragment.app.FragmentManager;
+
 /**
  * @author lakshaygirdhar
  * @since 13-08-2016
  */
-public class ReviewImageActivity extends AppCompatActivity implements View.OnClickListener {
+public class ReviewImageActivity extends AppCompatActivity implements View.OnClickListener
+{
     protected Toolbar toolbar;
     private String imagePath;
 
@@ -91,9 +93,7 @@ public class ReviewImageActivity extends AppCompatActivity implements View.OnCli
             finish();
         } else if (id == R.id.bCancel) {
             //Uri uri = Uri.parse(imagePath);
-            Uri uri = FileProvider.getUriForFile(this,
-                    NeonUtils.getFileProviderAuthority(this),
-                    new File(imagePath));
+            Uri uri = FileProvider.getUriForFile(this, NeonUtils.getFileProviderAuthority(this), new File(imagePath));
             File fdelete = new File(uri.getPath());
             if (fdelete.exists()) {
                 if (fdelete.delete()) {

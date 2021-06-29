@@ -1,7 +1,6 @@
 package com.gaadi.neon.activity.neutral;
 
 import android.os.Bundle;
-import android.support.v4.app.FragmentManager;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -29,12 +28,15 @@ import com.scanlibrary.R;
 import java.util.ArrayList;
 import java.util.List;
 
+import androidx.fragment.app.FragmentManager;
+
 /**
  * @author princebatra
  * @version 1.0
  * @since 3/2/17
  */
-public class NeonNeutralActivity extends NeonBaseNeutralActivity implements View.OnClickListener {
+public class NeonNeutralActivity extends NeonBaseNeutralActivity implements View.OnClickListener
+{
 
     ArrayAdapter<String> adapter;
     private TextView txtTagTitle, showMinCount;

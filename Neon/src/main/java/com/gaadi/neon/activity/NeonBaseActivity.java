@@ -5,12 +5,6 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
@@ -22,27 +16,39 @@ import com.gaadi.neon.util.ManifestPermission;
 import com.gaadi.neon.util.PermissionType;
 import com.scanlibrary.R;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+
 /**
  * @author princebatra
  * @version 1.0
  * @since 25/1/17
  */
-public abstract class NeonBaseActivity extends AppCompatActivity{
+public abstract class NeonBaseActivity extends AppCompatActivity
+{
 
     protected FrameLayout frameLayout;
     protected Toolbar toolbar;
     private OnPermissionResultListener permissionResultListener;
-    private final int permissionRequestCode=1;
+    private final int permissionRequestCode = 1;
 
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
+    protected void onCreate(
+            @Nullable
+                    Bundle savedInstanceState)
+    {
         setTheme(R.style.NeonLibTheme);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_base);
         frameLayout = (FrameLayout) findViewById(R.id.content_frame);
         toolbar = (Toolbar) findViewById(R.id.tool_bar);
 
-        if(toolbar!=null){
+        if(toolbar != null)
+        {
             setSupportActionBar(toolbar);
             toolbar.setNavigationIcon(R.drawable.ic_left_arrow);
         }
@@ -56,7 +62,8 @@ public abstract class NeonBaseActivity extends AppCompatActivity{
     @Override
     public void setTitle(CharSequence title) {
         SpannableString s = new SpannableString(title);
-        s.setSpan(new ForegroundColorSpan(ContextCompat.getColor(this,R.color.neon_toolbar_icons_color)), 0, title.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        s.setSpan(new ForegroundColorSpan(ContextCompat.getColor(this, R.color.neon_toolbar_icons_color)), 0, title.length(),
+                  Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         super.setTitle(s);
     }
 
@@ -176,16 +183,21 @@ public abstract class NeonBaseActivity extends AppCompatActivity{
             permissionResultListener.onResult(true);
             return;
         }
-        ActivityCompat.requestPermissions(this,permissionName,permissionRequestCode);
+        ActivityCompat.requestPermissions(this, permissionName, permissionRequestCode);
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
-                                           @NonNull int[] grantResults) {
-        switch (requestCode) {
-            case permissionRequestCode: {
-                permissionResultListener.onResult(grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED);
+    public void onRequestPermissionsResult(int requestCode,
+                                           @NonNull
+                                                   String[] permissions,
+                                           @NonNull
+                                                   int[] grantResults)
+    {
+        switch(requestCode)
+        {
+            case permissionRequestCode:
+            {
+                permissionResultListener.onResult(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED);
             }
         }
     }

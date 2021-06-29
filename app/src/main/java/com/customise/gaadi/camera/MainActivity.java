@@ -3,7 +3,6 @@ package com.customise.gaadi.camera;
 import android.location.Location;
 import android.media.ExifInterface;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
@@ -37,7 +36,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements OnImageCollectionListener, FindLocations.ILocation {
+import androidx.appcompat.app.AppCompatActivity;
+
+public class MainActivity extends AppCompatActivity implements OnImageCollectionListener, FindLocations.ILocation
+{
 
     private static final String TAG = "MainActivity";
     List<FileInfo> allreadyImages;
