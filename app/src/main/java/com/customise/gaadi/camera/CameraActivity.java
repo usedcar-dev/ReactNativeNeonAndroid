@@ -2,9 +2,6 @@ package com.customise.gaadi.camera;
 
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.FrameLayout;
 
@@ -13,7 +10,6 @@ import com.gaadi.neon.enumerations.CameraFacing;
 import com.gaadi.neon.enumerations.CameraOrientation;
 import com.gaadi.neon.enumerations.CameraType;
 import com.gaadi.neon.enumerations.GalleryType;
-import com.gaadi.neon.enumerations.ResponseCode;
 import com.gaadi.neon.fragment.ImageShowFragment;
 import com.gaadi.neon.interfaces.ICameraParam;
 import com.gaadi.neon.interfaces.IGalleryParam;
@@ -26,32 +22,41 @@ import com.gaadi.neon.util.FileInfo;
 import com.gaadi.neon.util.NeonException;
 import com.gaadi.neon.util.NeonImagesHandler;
 
-import java.util.HashMap;
 import java.util.List;
+
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 
 /**
  * @author dipanshugarg
  * @version 1.0
  * @since 2/3/17
  */
-public class CameraActivity extends AppCompatActivity {
+public class CameraActivity extends AppCompatActivity
+{
 
     private List<FileInfo> totalList;
     private View camera, gallary;
     private FrameLayout frame;
 
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
+    protected void onCreate(
+            @Nullable
+                    Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.camera_layout);
         camera = (View) findViewById(R.id.camera);
         gallary = (View) findViewById(R.id.gallary);
         frame = (FrameLayout) findViewById(R.id.frame);
 
-        gallary.setOnClickListener(new View.OnClickListener() {
+        gallary.setOnClickListener(new View.OnClickListener()
+        {
             @Override
-            public void onClick(View v) {
-                try {
+            public void onClick(View v)
+            {
+                try
+                {
                     PhotosLibrary.collectPhotos(NeonImagesHandler.getSingletonInstance().getRequestCode(),CameraActivity.this,NeonImagesHandler.getSingletonInstance().getLibraryMode(), PhotosMode.setGalleryMode().setParams(new IGalleryParam() {
                         @Override
                         public boolean selectVideos() {

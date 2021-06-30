@@ -2,8 +2,6 @@ package com.gaadi.neon.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.view.ViewPager;
-import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -18,7 +16,11 @@ import com.gaadi.neon.util.Constants;
 import com.gaadi.neon.util.NeonImagesHandler;
 import com.scanlibrary.R;
 
-public class ImageReviewActivity extends NeonBaseActivity implements View.OnClickListener, FragmentListener {
+import androidx.appcompat.widget.Toolbar;
+import androidx.viewpager.widget.ViewPager;
+
+public class ImageReviewActivity extends NeonBaseActivity implements View.OnClickListener, FragmentListener
+{
 
     private ImagesReviewViewPagerAdapter mPagerAdapter;
 

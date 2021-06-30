@@ -149,7 +149,7 @@
         android:background="@drawable/flash_circle"
         android:contentDescription="@null" />
 
-    <android.support.v7.widget.RecyclerView
+    <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvFlash"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

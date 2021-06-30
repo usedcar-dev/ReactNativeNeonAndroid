@@ -1,24 +1,26 @@
 package com.gaadi.neon.adapter;
 
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentStatePagerAdapter;
-
 import com.gaadi.neon.fragment.ImageReviewViewPagerFragment;
 import com.gaadi.neon.util.NeonImagesHandler;
 
 import java.util.ArrayList;
+
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentStatePagerAdapter;
 
 /**
  * @author dipanshugarg
  * @version 1.0
  * @since 25/1/17
  */
-public class ImagesReviewViewPagerAdapter extends FragmentStatePagerAdapter {
+public class ImagesReviewViewPagerAdapter extends FragmentStatePagerAdapter
+{
     private ArrayList<ImageReviewViewPagerFragment> fragmentList;
     private FragmentManager mFragmentManager;
 
-    public ImagesReviewViewPagerAdapter(FragmentManager fm) {
+    public ImagesReviewViewPagerAdapter(FragmentManager fm)
+    {
         super(fm);
         mFragmentManager = fm;
         updatePagerItems();

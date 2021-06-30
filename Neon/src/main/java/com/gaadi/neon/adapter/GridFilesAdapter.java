@@ -1,8 +1,6 @@
 package com.gaadi.neon.adapter;
 
 import android.content.Context;
-import android.support.media.ExifInterface;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,6 +24,8 @@ import com.scanlibrary.R;
 import java.io.File;
 import java.util.ArrayList;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.exifinterface.media.ExifInterface;
 
 /**
  * @author princebatra

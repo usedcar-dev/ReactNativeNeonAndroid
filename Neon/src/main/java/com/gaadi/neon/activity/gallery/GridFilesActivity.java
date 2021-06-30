@@ -3,17 +3,17 @@ package com.gaadi.neon.activity.gallery;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AlertDialog;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.GridView;
 import android.widget.Toast;
-import com.gaadi.neon.enumerations.CameraFacing;
-import com.gaadi.neon.enumerations.CameraOrientation;
-import com.gaadi.neon.enumerations.CameraType;
+
 import com.gaadi.neon.PhotosLibrary;
 import com.gaadi.neon.activity.ImageShow;
 import com.gaadi.neon.adapter.GridFilesAdapter;
+import com.gaadi.neon.enumerations.CameraFacing;
+import com.gaadi.neon.enumerations.CameraOrientation;
+import com.gaadi.neon.enumerations.CameraType;
 import com.gaadi.neon.enumerations.ResponseCode;
 import com.gaadi.neon.interfaces.ICameraParam;
 import com.gaadi.neon.interfaces.OnPermissionResultListener;
@@ -24,19 +24,23 @@ import com.gaadi.neon.util.CustomParameters;
 import com.gaadi.neon.util.FileInfo;
 import com.gaadi.neon.util.ManifestPermission;
 import com.gaadi.neon.util.NeonException;
-import com.gaadi.neon.util.PermissionType;
 import com.gaadi.neon.util.NeonImagesHandler;
+import com.gaadi.neon.util.PermissionType;
 import com.scanlibrary.R;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class GridFilesActivity extends NeonBaseGalleryActivity {
+import androidx.appcompat.app.AlertDialog;
+
+public class GridFilesActivity extends NeonBaseGalleryActivity
+{
 
     List<FileInfo> recentelyImageCollection;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
         getLayoutInflater().inflate(R.layout.activity_grid_files, frameLayout);
         recentelyImageCollection = new ArrayList<>();

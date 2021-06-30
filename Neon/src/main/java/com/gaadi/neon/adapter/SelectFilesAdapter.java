@@ -3,7 +3,6 @@ package com.gaadi.neon.adapter;
 import android.content.Context;
 import android.database.Cursor;
 import android.provider.MediaStore;
-import android.support.v4.content.ContextCompat;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CursorAdapter;
@@ -19,7 +18,7 @@ import com.scanlibrary.R;
 
 import java.util.HashSet;
 
-import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade;
+import androidx.core.content.ContextCompat;
 
 /**
  * Created by Lakshay
@@ -65,7 +64,7 @@ public class SelectFilesAdapter extends CursorAdapter implements View.OnClickLis
         } else {
             holder.transparentLayer.setVisibility(View.VISIBLE);
             holder.selection_view.setVisibility(View.VISIBLE);
-            holder.selectedImage.setBackgroundColor(ContextCompat.getColor(context,R.color.transparent_white));
+            holder.selectedImage.setBackgroundColor(ContextCompat.getColor(context, R.color.transparent_white));
             this.updateSelection.updateSelected(imagePath, true);
             selectedArr.add(String.valueOf(position));
         }

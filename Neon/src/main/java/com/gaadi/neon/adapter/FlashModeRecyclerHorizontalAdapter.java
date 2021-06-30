@@ -1,7 +1,6 @@
 package com.gaadi.neon.adapter;
 
 import android.content.Context;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,13 +12,16 @@ import com.scanlibrary.R;
 
 import java.util.ArrayList;
 
+import androidx.recyclerview.widget.RecyclerView;
+
 /**
  * @author lakshaygirdhar
- * @since 22-08-2016
  * @version 1.0
+ * @since 22-08-2016
  */
 
-public class FlashModeRecyclerHorizontalAdapter extends RecyclerView.Adapter<FlashModeRecyclerHorizontalAdapter.ViewHolder> {
+public class FlashModeRecyclerHorizontalAdapter extends RecyclerView.Adapter<FlashModeRecyclerHorizontalAdapter.ViewHolder>
+{
 
     private static final String TAG = "FlashModeRecycler";
     private Context mContext;

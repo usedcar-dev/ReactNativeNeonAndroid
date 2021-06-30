@@ -1,7 +1,6 @@
 package com.gaadi.neon.fragment;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -14,7 +13,6 @@ import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.OpenableColumns;
-import android.support.v4.app.Fragment;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -32,6 +30,7 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
+import com.canhub.cropper.CropImage;
 import com.gaadi.neon.adapter.ImageTagsAdapter;
 import com.gaadi.neon.events.ImageEditEvent;
 import com.gaadi.neon.interfaces.FragmentListener;
@@ -41,7 +40,6 @@ import com.gaadi.neon.util.FileInfo;
 import com.gaadi.neon.util.NeonImagesHandler;
 import com.gaadi.neon.util.NeonUtils;
 import com.scanlibrary.R;
-import com.soundcloud.android.crop.Crop;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -49,12 +47,17 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
+import androidx.fragment.app.Fragment;
+
+import static android.app.Activity.RESULT_OK;
+
 /**
  * @author dipanshugarg
  * @version 1.0
  * @since 25/1/17
  */
-public class ImageReviewViewPagerFragment extends Fragment implements View.OnClickListener {
+public class ImageReviewViewPagerFragment extends Fragment implements View.OnClickListener
+{
 
     /**
      * The argument key for the page number this fragment represents.
@@ -157,7 +160,8 @@ public class ImageReviewViewPagerFragment extends Fragment implements View.OnCli
             fileEditLayout.setVisibility(View.VISIBLE);
         }
 
-        if(NeonImagesHandler.getSingletonInstance().getLivePhotosListener()!=null){
+        if(NeonImagesHandler.getSingletonInstance().getLivePhotosListener() != null)
+        {
             fileEditLayout.setVisibility(View.GONE);
             tagLayout.setVisibility(View.GONE);
         }
@@ -165,32 +169,34 @@ public class ImageReviewViewPagerFragment extends Fragment implements View.OnCli
         return rootView;
     }
 
-    public void onLoad(Bundle savedInstanceState) {
+    public void onLoad(Bundle savedInstanceState)
+    {
         Bundle bundle = getArguments();
         imageModel = (FileInfo) bundle.getSerializable(Constants.IMAGE_MODEL_FOR__REVIEW);
-        if (savedInstanceState != null) {
+        if(savedInstanceState != null)
+        {
             Object o = bundle.getSerializable(Constants.IMAGE_MODEL_FOR__REVIEW);
-            if (o != null) {
+            if(o != null)
+            {
                 imageModel = (FileInfo) o;
             }
         }
-        if (imageModel.getFileTag() != null) {
+        if(imageModel.getFileTag() != null)
+        {
             txtVwTagSpinner.setText(imageModel.getFileTag().getTagName());
         }
 
-        RequestOptions options = new RequestOptions()
-                .diskCacheStrategy(DiskCacheStrategy.NONE)
+        RequestOptions options = new RequestOptions().diskCacheStrategy(DiskCacheStrategy.NONE)
                 .skipMemoryCache(true)
                 .placeholder(R.drawable.default_placeholder);
-        Glide.with(mContext).load(imageModel.getFilePath())
-                .apply(options)
-                .into(draweeView);
-
-        /*Glide.with(mContext).load(imageModel.getFilePath())
-                .placeholder(R.drawable.default_placeholder)
-                .diskCacheStrategy(DiskCacheStrategy.NONE)
-                .skipMemoryCache(true)
-                .into(draweeView);*/
+        if(imageModel.getFilePath().contains("content://") || imageModel.getFilePath().contains("file://"))
+        {
+            Glide.with(mContext).load(Uri.parse(imageModel.getFilePath())).apply(options).into(draweeView);
+        }
+        else
+        {
+            Glide.with(mContext).load(imageModel.getFilePath()).apply(options).into(draweeView);
+        }
     }
 
     @Override
@@ -243,19 +249,34 @@ public class ImageReviewViewPagerFragment extends Fragment implements View.OnCli
     public void onClick(View v) {
         ImageEditEvent event = new ImageEditEvent();
         event.setModel(imageModel);
-        if (v.getId() == R.id.imagereview_deletebtn) {
+        if(v.getId() == R.id.imagereview_deletebtn)
+        {
             event.setImageEventType(ImageEditEvent.EVENT_DELETE);
             event.setPosition(mPageNumber);
             warnDeleteDialog(event);
-        } else if (v.getId() == R.id.imagereview_rotatebtn) {
-            if (imageModel.getSource() == FileInfo.SOURCE.PHONE_CAMERA) {
+        }
+        else if(v.getId() == R.id.imagereview_rotatebtn)
+        {
+            if(imageModel.getSource() == FileInfo.SOURCE.PHONE_CAMERA && !imageModel.getFilePath()
+                    .contains("content://") && !imageModel.getFilePath().contains("file://"))
+            {
                 rotateImage(imageModel.getFilePath());
-            } else
+            }
+            else
             {
                 String filePath = copyFileToInternalStorage(Uri.parse(imageModel.getFilePath()), "Evaluator");
-                rotateImage(filePath);
+                if(null != filePath)
+                {
+                    rotateImage(filePath);
+                }
+                else
+                {
+                    rotateImage(imageModel.getFilePath());
+                }
             }
-        } else if (v.getId() == R.id.imagereview_tag_spinner) {
+        }
+        else if(v.getId() == R.id.imagereview_tag_spinner)
+        {
             showTagsDropDown(v);
         } else if (v.getId() == R.id.imagereview_cropbtn) {
             try {
@@ -331,6 +352,7 @@ public class ImageReviewViewPagerFragment extends Fragment implements View.OnCli
 
             draweeView.setRotation(draweeView.getRotation() + 90.0f);
             ImageEditEvent event = new ImageEditEvent();
+            imageModel.setFilePath(path);
             event.setModel(imageModel);
             event.setImageEventType(ImageEditEvent.EVENT_ROTATE);
             ((FragmentListener) getActivity()).getFragmentChanges(event);
@@ -347,41 +369,56 @@ public class ImageReviewViewPagerFragment extends Fragment implements View.OnCli
             }*/
             //System.gc();
             // return b;
-        } catch (Exception e) {
+        }
+        catch(Exception e)
+        {
             Log.e("my tag", e.getMessage(), e);
             // return null;
         }
         return null;
     }
 
-
-    public void rotateImage(String path) {
+    public void rotateImage(String path)
+    {
         File file = new File(path);
         ExifInterface exifInterface = null;
-        try {
-            exifInterface = new ExifInterface(file.getPath());
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        int orientation = exifInterface.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
-        if ((orientation == ExifInterface.ORIENTATION_NORMAL) | (orientation == 0)) {
-            exifInterface.setAttribute(ExifInterface.TAG_ORIENTATION, "" + ExifInterface.ORIENTATION_ROTATE_90);
-        } else if (orientation == ExifInterface.ORIENTATION_ROTATE_90) {
-            exifInterface.setAttribute(ExifInterface.TAG_ORIENTATION, "" + ExifInterface.ORIENTATION_ROTATE_180);
-        } else if (orientation == ExifInterface.ORIENTATION_ROTATE_180) {
-            exifInterface.setAttribute(ExifInterface.TAG_ORIENTATION, "" + ExifInterface.ORIENTATION_ROTATE_270);
-        } else if (orientation == ExifInterface.ORIENTATION_ROTATE_270) {
-            exifInterface.setAttribute(ExifInterface.TAG_ORIENTATION, "" + ExifInterface.ORIENTATION_NORMAL);
-        }
         try
         {
-            exifInterface.saveAttributes();
+            exifInterface = new ExifInterface((path.contains("content://") || path.contains("file://")) ? path : file.getPath());
         }
         catch(IOException e)
         {
             // TODO Auto-generated catch block
             e.printStackTrace();
+        }
+        if(null != exifInterface)
+        {
+            int orientation = exifInterface.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
+            if((orientation == ExifInterface.ORIENTATION_NORMAL) | (orientation == 0))
+            {
+                exifInterface.setAttribute(ExifInterface.TAG_ORIENTATION, "" + ExifInterface.ORIENTATION_ROTATE_90);
+            }
+            else if(orientation == ExifInterface.ORIENTATION_ROTATE_90)
+            {
+                exifInterface.setAttribute(ExifInterface.TAG_ORIENTATION, "" + ExifInterface.ORIENTATION_ROTATE_180);
+            }
+            else if(orientation == ExifInterface.ORIENTATION_ROTATE_180)
+            {
+                exifInterface.setAttribute(ExifInterface.TAG_ORIENTATION, "" + ExifInterface.ORIENTATION_ROTATE_270);
+            }
+            else if(orientation == ExifInterface.ORIENTATION_ROTATE_270)
+            {
+                exifInterface.setAttribute(ExifInterface.TAG_ORIENTATION, "" + ExifInterface.ORIENTATION_NORMAL);
+            }
+            try
+            {
+                exifInterface.saveAttributes();
+            }
+            catch(IOException e)
+            {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
         }
         getBitmap(path);
     }
@@ -453,25 +490,35 @@ public class ImageReviewViewPagerFragment extends Fragment implements View.OnCli
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent result)
+    public void onActivityResult(int requestCode, int resultCode, Intent data)
     {
-        if(requestCode == Crop.REQUEST_CROP && resultCode == Activity.RESULT_OK)
+        if(requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE)
         {
-            if(cropFilePath != null)
+            CropImage.ActivityResult result = CropImage.getActivityResult(data);
+            if(resultCode == RESULT_OK && null != result)
             {
-                imageModel.setFilePath(cropFilePath.getAbsolutePath());
+                // String filePath = result.getUriFilePath(requireContext(), false);
+                if(imageModel.getSource() == FileInfo.SOURCE.PHONE_CAMERA || (null != result.getUriContent() && result.getUriContent()
+                        .toString()
+                        .contains("file://")))
+                {
+                    imageModel.setFilePath(result.getUriFilePath(requireContext(), true));
+                }
+                else
+                {
+                    imageModel.setFilePath(result.getUriContent().toString());
+                }
+                Uri uri = result.getUriContent();
                 RequestOptions options = new RequestOptions().diskCacheStrategy(DiskCacheStrategy.NONE)
                         .skipMemoryCache(true)
                         .placeholder(R.drawable.default_placeholder);
-                Glide.with(this).load(imageModel.getFilePath())
-                        .apply(options)
-                        .into(draweeView);
+                Glide.with(this).load(uri).apply(options).into(draweeView);
             }
-            /*Glide.with(mContext).load(imageModel.getFilePath())
-                    .placeholder(R.drawable.default_placeholder)
-                    .diskCacheStrategy(DiskCacheStrategy.NONE)
-                    .skipMemoryCache(true)
-                    .into(draweeView);*/
+            else if(resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE && null != result)
+            {
+                Exception error = result.getError();
+                Log.e("Exception", error.getMessage());
+            }
         }
     }
 

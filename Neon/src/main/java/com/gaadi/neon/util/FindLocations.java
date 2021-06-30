@@ -6,9 +6,6 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Build;
 import android.os.Looper;
-import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -26,12 +23,17 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 
+import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+
 /**
  * @author Pavan
  * @version 1.0
  * @since 12/4/17
  */
-public class FindLocations {
+public class FindLocations
+{
 
     private LocationRequest mLocationRequest;
 
@@ -160,8 +162,7 @@ public class FindLocations {
 
     public boolean checkPermissions(Activity activity, ILocation callBack) {
         if (Build.VERSION.SDK_INT >= 23) {
-            if (ContextCompat.checkSelfPermission(activity,
-                    Manifest.permission.ACCESS_FINE_LOCATION)
+            if (ContextCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION)
                     != PackageManager.PERMISSION_GRANTED) {
                 requestLocationPermission(activity);
                 return false;
@@ -210,7 +211,10 @@ public class FindLocations {
         });
         task.addOnFailureListener(activity, new OnFailureListener() {
             @Override
-            public void onFailure(@NonNull Exception e) {
+            public void onFailure(
+                    @NonNull
+                            Exception e)
+            {
                 callBack.getPermissionStatus(false);
             }
         });

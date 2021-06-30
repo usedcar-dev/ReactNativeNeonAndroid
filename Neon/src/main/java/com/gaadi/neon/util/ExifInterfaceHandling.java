@@ -1,13 +1,12 @@
 package com.gaadi.neon.util;
 
 import android.location.Location;
-import android.support.media.ExifInterface;
-
 
 import java.io.File;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
+
+import androidx.exifinterface.media.ExifInterface;
 
 /**
  * @author Pavan
@@ -15,14 +14,16 @@ import java.util.Date;
  * @since 14/7/17
  */
 
-public class ExifInterfaceHandling extends ExifInterface {
+public class ExifInterfaceHandling extends ExifInterface
+{
 
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
 
-    public ExifInterfaceHandling(File file) throws IOException {
-       super(file.getCanonicalPath());
+    public ExifInterfaceHandling(File file) throws IOException
+    {
+        super(file.getCanonicalPath());
     }
 
     // ------------------------------------------------------------------------

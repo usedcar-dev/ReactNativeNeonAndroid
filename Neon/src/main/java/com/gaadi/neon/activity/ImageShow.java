@@ -1,6 +1,5 @@
 package com.gaadi.neon.activity;
 
-import android.support.v4.app.FragmentManager;
 import android.os.Bundle;
 import android.view.MenuItem;
 
@@ -13,10 +12,14 @@ import com.gaadi.neon.util.NeonException;
 import com.gaadi.neon.util.NeonImagesHandler;
 import com.scanlibrary.R;
 
-public class ImageShow extends NeonBaseActivity {
+import androidx.fragment.app.FragmentManager;
+
+public class ImageShow extends NeonBaseActivity
+{
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
         getLayoutInflater().inflate(R.layout.activity_image_show, frameLayout);
         setTitle(R.string.image_review);

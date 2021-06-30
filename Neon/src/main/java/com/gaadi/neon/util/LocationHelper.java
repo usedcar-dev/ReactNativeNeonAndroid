@@ -4,10 +4,8 @@ import android.Manifest;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.os.Looper;
-import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.ResolvableApiException;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -25,11 +23,16 @@ import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.lang.ref.WeakReference;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+
 /**
  * Created by salman on 2/1/18.
  */
 
-public class LocationHelper extends LocationCallback {
+public class LocationHelper extends LocationCallback
+{
 
     public static final int REQUEST_CHECK_SETTINGS = 505;
     public static final int REQUEST_PERMISSIONS_REQUEST_CODE = 606;
@@ -114,12 +117,17 @@ public class LocationHelper extends LocationCallback {
                 })
                 .addOnFailureListener(activity.get(), new OnFailureListener() {
                     @Override
-                    public void onFailure(@NonNull Exception e) {
+                    public void onFailure(
+                            @NonNull
+                                    Exception e)
+                    {
                         int statusCode = ((ApiException) e).getStatusCode();
-                        switch (statusCode) {
+                        switch(statusCode)
+                        {
                             case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
                                 Log.i(TAG, "Location settings are not satisfied.");
-                                try {
+                                try
+                                {
                                     // Show the dialog by calling startResolutionForResult(), and check the
                                     // result in onActivityResult().
                                     ResolvableApiException rae = (ResolvableApiException) e;
