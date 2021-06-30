@@ -132,8 +132,8 @@ public class ImageShowAdapter extends BaseDynamicGridAdapter {
         });
 */
             if (NeonImagesHandler.getSingleonInstance().getImagesCollection().size() > 0) {
-                RequestOptions options = new RequestOptions()
-                        .diskCacheStrategy(DiskCacheStrategy.ALL)
+                RequestOptions options = new RequestOptions().diskCacheStrategy(DiskCacheStrategy.NONE)
+                        .skipMemoryCache(true)
                         .centerCrop()
                         .placeholder(R.drawable.default_placeholder);
                 Glide.with(context).load(NeonImagesHandler.getSingleonInstance().getImagesCollection().get(position).getFilePath())
