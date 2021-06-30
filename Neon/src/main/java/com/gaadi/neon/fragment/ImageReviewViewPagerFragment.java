@@ -6,14 +6,12 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.OpenableColumns;
 import android.support.v4.app.Fragment;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -39,13 +37,12 @@ import com.gaadi.neon.model.ImageTagModel;
 import com.gaadi.neon.util.Constants;
 import com.gaadi.neon.util.FileInfo;
 import com.gaadi.neon.util.NeonImagesHandler;
+import com.gaadi.neon.util.NeonUtils;
 import com.scanlibrary.R;
 import com.soundcloud.android.crop.Crop;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
 
 /**
@@ -248,71 +245,16 @@ public class ImageReviewViewPagerFragment extends Fragment implements View.OnCli
             warnDeleteDialog(event);
         } else if (v.getId() == R.id.imagereview_rotatebtn)
         {
-            if(imageModel.getSource() == FileInfo.SOURCE.PHONE_CAMERA && !imageModel.getFilePath()
-                    .contains("content://") && !imageModel.getFilePath().contains("file://"))
-            {
-                rotateImage(imageModel.getFilePath());
-            }
-            else
-            {
-                String filePath = copyFileToInternalStorage(Uri.parse(imageModel.getFilePath()), "Evaluator");
-                if(null != filePath)
-                {
-                    rotateImage(filePath);
-                }
-                else
-                {
-                    rotateImage(imageModel.getFilePath());
-                }
-            }
+            rotateImage(imageModel.getFilePath());
         } else if (v.getId() == R.id.imagereview_tag_spinner) {
             showTagsDropDown(v);
         } else if (v.getId() == R.id.imagereview_cropbtn) {
-            if (imageModel.getSource() == FileInfo.SOURCE.PHONE_CAMERA) {
-                Toast.makeText(getActivity(), getActivity().getString(R.string.coming_soon), Toast.LENGTH_SHORT).show();
-            } else {
-                Toast.makeText(getActivity(), getActivity().getString(R.string.gallery_image_editing_error), Toast.LENGTH_SHORT).show();
-            }
-            //            try {
-            //                cropFilePath = NeonUtils.getEmptyStoragePath(getActivity());
-            //                //Uri inputUri = Uri.fromFile(new File(imageModel.getFilePath()));
-            //                //Uri outputUri = Uri.fromFile(cropFilePath);
-            //                Uri inputUri = FileProvider.getUriForFile(getActivity(), NeonUtils.getFileProviderAuthority(getActivity()), new File(imageModel.getFilePath()));
-            //                Uri outputUri = FileProvider.getUriForFile(getActivity(), NeonUtils.getFileProviderAuthority(getActivity()), cropFilePath);
-            //                Crop.of(inputUri, outputUri).start(getActivity(), ImageReviewViewPagerFragment.this);
-            //            } catch (Exception e) {
-            //                e.printStackTrace();
-            //            }
-
             try
             {
-                if(imageModel.getSource() == FileInfo.SOURCE.PHONE_CAMERA)
-                {
-                    CropImage.activity(
-                            (imageModel.getFilePath().contains("file://") || imageModel.getFilePath().contains("content://")) ? Uri.parse(
-                                    imageModel.getFilePath()) : Uri.fromFile(new File(imageModel.getFilePath())))
-                            .setCropMenuCropButtonTitle("Crop")
-                            .setActivityTitle("Crop Image")
-                            .setAllowFlipping(false)
-                            .setAllowRotation(false)
-                            .start(requireContext(), this);
-                    Uri inputUri = (imageModel.getFilePath().contains("file://") || imageModel.getFilePath()
-                            .contains("content://")) ? Uri.parse(imageModel.getFilePath()) : Uri.fromFile(
-                            new File(imageModel.getFilePath()));
-
-                    Crop.of(inputUri, outputUri).start(getActivity(), ImageReviewViewPagerFragment.this);
-                }
-                else
-                {
-                    CropImage.activity(
-                            (imageModel.getFilePath().contains("file://") || imageModel.getFilePath().contains("content://")) ? Uri.parse(
-                                    imageModel.getFilePath()) : Uri.fromFile(new File(imageModel.getFilePath())))
-                            .setCropMenuCropButtonTitle("Crop")
-                            .setActivityTitle("Crop Image")
-                            .setAllowFlipping(false)
-                            .setAllowRotation(false)
-                            .start(requireContext(), this);
-                }
+                cropFilePath = NeonUtils.getEmptyStoragePath(getActivity());
+                Uri inputUri = Uri.fromFile(new File(imageModel.getFilePath()));
+                Uri outputUri = Uri.fromFile(cropFilePath);
+                Crop.of(inputUri, outputUri).start(getActivity(), ImageReviewViewPagerFragment.this);
             }
             catch(Exception e)
             {
@@ -321,71 +263,7 @@ public class ImageReviewViewPagerFragment extends Fragment implements View.OnCli
         }
     }
 
-    private String copyFileToInternalStorage(Uri uri, String newDirName)
-    {
-        Uri returnUri = uri;
 
-        Cursor returnCursor = mContext.getContentResolver()
-                .query(returnUri, new String[]{OpenableColumns.DISPLAY_NAME, OpenableColumns.SIZE}, null, null, null);
-        if(returnCursor == null)
-        {
-            return null;
-        }
-
-        try
-        {
-            if(returnCursor.moveToFirst())
-            {
-                int nameIndex = returnCursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
-                int sizeIndex = returnCursor.getColumnIndex(OpenableColumns.SIZE);
-                returnCursor.moveToFirst();
-                String name = (returnCursor.getString(nameIndex));
-                String size = (Long.toString(returnCursor.getLong(sizeIndex)));
-
-                File output;
-                if(!newDirName.equals(""))
-                {
-                    File dir = new File(mContext.getFilesDir() + "/" + newDirName);
-                    if(!dir.exists())
-                    {
-                        dir.mkdir();
-                    }
-                    output = new File(mContext.getFilesDir() + "/" + newDirName + "/" + name);
-                }
-                else
-                {
-                    output = new File(mContext.getFilesDir() + "/" + name);
-                }
-                try
-                {
-                    InputStream inputStream = mContext.getContentResolver().openInputStream(uri);
-                    FileOutputStream outputStream = new FileOutputStream(output);
-                    int read = 0;
-                    int bufferSize = 1024;
-                    final byte[] buffers = new byte[bufferSize];
-                    while((read = inputStream.read(buffers)) != -1)
-                    {
-                        outputStream.write(buffers, 0, read);
-                    }
-
-                    inputStream.close();
-                    outputStream.close();
-                }
-                catch(Exception e)
-                {
-
-                    Log.e("Exception", e.getMessage());
-                }
-
-                return output.getPath();
-            }
-        }
-        finally
-        {
-            returnCursor.close();
-        }
-        return null;
-    }
 
     private void warnDeleteDialog(final ImageEditEvent event)
     {
