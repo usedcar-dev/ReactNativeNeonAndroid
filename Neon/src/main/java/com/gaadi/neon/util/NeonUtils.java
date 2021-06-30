@@ -445,6 +445,7 @@ public class NeonUtils {
     }
 
     public static File getEmptyStoragePath(Context ctx) {
+/*
         File mediaFile = null;
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss.SSS").format(new Date());
         String selectedPath = null;
@@ -467,9 +468,14 @@ public class NeonUtils {
                 //Toast.makeText(ctx,"SUCCESS to create folder",Toast.LENGTH_SHORT).show();
             }
         }
+*/
 
-        mediaFile = new File(externalDir.getPath() + File.separator +
-                "IMG_" + timeStamp + ".jpg");
+        ContextWrapper cw = new ContextWrapper(ctx);
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss.SSS").format(new Date());
+        File mediaFile = new File(cw.getExternalCacheDir() + File.separator + "IMG_" + timeStamp + ".jpg");
+
+//        mediaFile = new File(externalDir.getPath() + File.separator +
+//                "IMG_" + timeStamp + ".jpg");
         return mediaFile;
     }
 

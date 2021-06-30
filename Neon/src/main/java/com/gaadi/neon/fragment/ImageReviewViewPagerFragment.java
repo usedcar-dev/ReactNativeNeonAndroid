@@ -39,6 +39,7 @@ import com.gaadi.neon.model.ImageTagModel;
 import com.gaadi.neon.util.Constants;
 import com.gaadi.neon.util.FileInfo;
 import com.gaadi.neon.util.NeonImagesHandler;
+import com.gaadi.neon.util.NeonUtils;
 import com.scanlibrary.R;
 import com.soundcloud.android.crop.Crop;
 
@@ -257,21 +258,16 @@ public class ImageReviewViewPagerFragment extends Fragment implements View.OnCli
         } else if (v.getId() == R.id.imagereview_tag_spinner) {
             showTagsDropDown(v);
         } else if (v.getId() == R.id.imagereview_cropbtn) {
-            if (imageModel.getSource() == FileInfo.SOURCE.PHONE_CAMERA) {
-                Toast.makeText(getActivity(), getActivity().getString(R.string.coming_soon), Toast.LENGTH_SHORT).show();
-            } else {
-                Toast.makeText(getActivity(), getActivity().getString(R.string.gallery_image_editing_error), Toast.LENGTH_SHORT).show();
-            }
-//            try {
-//                cropFilePath = NeonUtils.getEmptyStoragePath(getActivity());
-//                //Uri inputUri = Uri.fromFile(new File(imageModel.getFilePath()));
-//                //Uri outputUri = Uri.fromFile(cropFilePath);
+            try {
+                cropFilePath = NeonUtils.getEmptyStoragePath(getActivity());
+                Uri inputUri = Uri.fromFile(new File(imageModel.getFilePath()));
+                Uri outputUri = Uri.fromFile(cropFilePath);
 //                Uri inputUri = FileProvider.getUriForFile(getActivity(), NeonUtils.getFileProviderAuthority(getActivity()), new File(imageModel.getFilePath()));
 //                Uri outputUri = FileProvider.getUriForFile(getActivity(), NeonUtils.getFileProviderAuthority(getActivity()), cropFilePath);
-//                Crop.of(inputUri, outputUri).start(getActivity(), ImageReviewViewPagerFragment.this);
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
+                Crop.of(inputUri, outputUri).start(getActivity(), ImageReviewViewPagerFragment.this);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
