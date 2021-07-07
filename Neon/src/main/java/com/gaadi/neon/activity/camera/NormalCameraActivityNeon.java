@@ -627,8 +627,6 @@ public class NormalCameraActivityNeon extends NeonBaseCameraActivity implements 
     protected void onStop()
     {
         super.onStop();
-        locationTracker.stopLocationUpdates();
-        locationTracker.setLocationListener(null);
     }
 
     @Override
@@ -652,6 +650,7 @@ public class NormalCameraActivityNeon extends NeonBaseCameraActivity implements 
                 Toast.makeText(this, NeonImagesHandler.getSingletonInstance().getCurrentTag() + " File does not exist", Toast.LENGTH_SHORT).show();
                 return false;
             } else {
+                locationTracker.getLocation();
                 String appName = Constants.getAppName(this);
                 ExifInterfaceHandling exifInterfaceHandling = new ExifInterfaceHandling(file);
                 if(location != null)
@@ -721,15 +720,17 @@ public class NormalCameraActivityNeon extends NeonBaseCameraActivity implements 
                         Log.d("NormalCamera", "onError: "+i);
                         afterPictureTaken(mInputImagePath);
                     }
+
                     @Override
-                    public void onCancel() {
+                    public void onCancel()
+                    {
                         Log.d("NormalCamera", "onCancel: ");
                         afterPictureTaken(mInputImagePath);
                     }
                 });
             }
         }
-        if(requestCode == LocationHelper.REQUEST_CHECK_SETTINGS && resultCode == RESULT_OK)
+        if(requestCode == LocationHelper.REQUEST_CHECK_SETTINGS)
         {
             locationTracker.getLocation();
         }
