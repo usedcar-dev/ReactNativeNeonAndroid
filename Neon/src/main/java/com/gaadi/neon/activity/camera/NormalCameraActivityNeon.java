@@ -137,6 +137,7 @@ public class NormalCameraActivityNeon extends NeonBaseCameraActivity implements 
     @Override
     protected void onResume() {
         super.onResume();
+        showTagImages();
         bindCameraFragment();
         new Handler().postDelayed(new Runnable() {
             @Override
