@@ -254,6 +254,19 @@ public class CameraFragment1 extends Fragment implements View.OnTouchListener, C
             setCompressBy = NeonImagesHandler.getSingletonInstance().getCameraParam().getCustomParameters().getCompressBy();
         }
 
+        checkLocationAndStartUpdate();
+    }
+
+
+    private void checkLocationAndStartUpdate(){
+        if(locationTracker.checkPermissions())
+        {
+            locationTracker.getLocation();
+        }
+        else
+        {
+            locationTracker.requestPermissions();
+        }
     }
 
     public void setMask(String maskUrl) {
@@ -273,9 +286,9 @@ public class CameraFragment1 extends Fragment implements View.OnTouchListener, C
     public void onClick(View v) {
         if (v.getId() == R.id.buttonCaptureVertical || v.getId() == R.id.buttonCaptureHorizontal)
         {
-            if(locationRestrictive)
+            if(locationRestrictive && location==null)
             {
-                locationTracker.getLocation();
+                Toast.makeText(getActivity(), "Fetching Location...", Toast.LENGTH_SHORT).show();
             }
             else
             {
@@ -879,14 +892,6 @@ public class CameraFragment1 extends Fragment implements View.OnTouchListener, C
     public void onLocationChanged(Location location)
     {
         this.location = location;
-        if(null != location)
-        {
-            clickPicture();
-        }
-        else
-        {
-            clickPicture();
-        }
     }
 
     public interface PictureTakenListener

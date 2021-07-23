@@ -44,6 +44,7 @@ public class LocationHelper extends LocationCallback
     private FusedLocationProviderClient mFusedLocationClient;
     private SettingsClient mSettingsClient;
     private LocationListener tracker;
+    private Location location;
 
     public LocationHelper(AppCompatActivity activity)
     {
@@ -67,14 +68,10 @@ public class LocationHelper extends LocationCallback
 
     public void getLocation()
     {
-
-        if(checkPermissions())
-        {
+        if(this.location!=null && tracker!=null){
+            tracker.onLocationChanged(this.location);
+        }else{
             startLocationUpdates();
-        }
-        else
-        {
-            requestPermissions();
         }
     }
 
@@ -112,9 +109,10 @@ public class LocationHelper extends LocationCallback
     public void onLocationResult(LocationResult locationResult)
     {
         super.onLocationResult(locationResult);
-        if(tracker != null)
+        this.location = locationResult.getLastLocation();
+        if(tracker != null && this.location!=null)
         {
-            tracker.onLocationChanged(locationResult.getLastLocation());
+            tracker.onLocationChanged(this.location);
         }
         stopLocationUpdates();
     }
@@ -151,14 +149,6 @@ public class LocationHelper extends LocationCallback
             {
             }
 
-            //        try
-            //        {
-            //            network_enabled = lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
-            //        }
-            //        catch(Exception ex)
-            //        {
-            //        }
-
             if(!gps_enabled)
             {
                 activity.get().startActivityForResult(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS), 505);
@@ -170,66 +160,16 @@ public class LocationHelper extends LocationCallback
                         .checkSelfPermission(activity.get(),
                                              Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
                 {
-                    // TODO: Consider calling
-                    //    ActivityCompat#requestPermissions
-                    // here to request the missing permissions, and then overriding
-                    //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                    //                                          int[] grantResults)
-                    // to handle the case where the user grants the permission. See the documentation
-                    // for ActivityCompat#requestPermissions for more details.
                     return;
                 }
                 mFusedLocationClient.requestLocationUpdates(mLocationRequest, LocationHelper.this, Looper.myLooper());
                 //getLastLocation();
             }
-            //        mSettingsClient.checkLocationSettings(mLocationSettingsRequest)
-            //                .addOnSuccessListener(activity.get(), new OnSuccessListener<LocationSettingsResponse>() {
-            //                    @Override
-            //                    public void onSuccess(LocationSettingsResponse locationSettingsResponse) {
-            //                        Log.i(TAG, "All location settings are satisfied.");
-            //
-            //                        //noinspection MissingPermission
-            ////                        mFusedLocationClient.requestLocationUpdates(mLocationRequest,
-            ////                                LocationHelper.this, Looper.myLooper());
-            //                        getLastLocation();
-            //
-            //
-            //                    }
-            //                })
-            //                .addOnFailureListener(activity.get(), new OnFailureListener() {
-            //                    @Override
-            //                    public void onFailure(@NonNull Exception e) {
-            //                        int statusCode = ((ApiException) e).getStatusCode();
-            //                        switch (statusCode) {
-            //                            case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
-            //                                Log.i(TAG, "Location settings are not satisfied.");
-            //                                try {
-            //                                    // Show the dialog by calling startResolutionForResult(), and check the
-            //                                    // result in onActivityResult().
-            //                                    ResolvableApiException rae = (ResolvableApiException) e;
-            //                                    rae.startResolutionForResult(activity.get(), REQUEST_CHECK_SETTINGS);
-            //
-            //                                } catch (IntentSender.SendIntentException sie) {
-            //                                    Log.i(TAG, "PendingIntent unable to execute request.");
-            //                                }
-            //                                break;
-            //                            case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
-            //                                String errorMessage = "Location settings are inadequate, and cannot be " +
-            //                                        "fixed here. Fix in Settings.";
-            //                                Log.e(TAG, errorMessage);
-            //                                break;
-            //                            default:
-            //                                Log.e(TAG, "Location Update Failed.");
-            //
-            //                        }
-            //
-            //                    }
-            //                });
         }
     }
 
 
-    private void requestPermissions() {
+    public void requestPermissions() {
 
         ActivityCompat.requestPermissions(activity.get(),
                                           new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION},

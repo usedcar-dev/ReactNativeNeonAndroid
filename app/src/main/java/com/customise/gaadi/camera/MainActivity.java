@@ -236,7 +236,7 @@ public class MainActivity extends AppCompatActivity implements OnImageCollection
 
                 @Override
                 public CameraOrientation getCameraOrientation() {
-                    return CameraOrientation.portrait;
+                    return CameraOrientation.landscape;
                 }
 
                 @Override
@@ -312,11 +312,11 @@ public class MainActivity extends AppCompatActivity implements OnImageCollection
                 @Override
                 public List<ImageTagModel> getImageTagsModel() {
                     ArrayList<ImageTagModel> list = new ArrayList<ImageTagModel>();
-                    for (int i = 0; i < numberOfTags; i++) {
+                    for (int i = 0; i < 20; i++) {
                         if (i % 2 == 0) {
                             list.add(new ImageTagModel("Tag" + i, String.valueOf(i), true, 1));
                         } else {
-                            list.add(new ImageTagModel("Tag" + i, String.valueOf(i), false, 1));
+                            list.add(new ImageTagModel("Tag" + i, String.valueOf(i), true, 1));
                         }
                     }
                     return list;
@@ -334,7 +334,9 @@ public class MainActivity extends AppCompatActivity implements OnImageCollection
 
                 @Override
                 public CustomParameters getCustomParameters() {
-                    return new CustomParameters.CustomParametersBuilder().sethideCameraButtonInNeutral(false).setLocationRestrictive(false).build();
+                    return new CustomParameters.CustomParametersBuilder()
+                            .sethideCameraButtonInNeutral(false)
+                            .setLocationRestrictive(true).build();
                 }
             }), this);
         } catch (NeonException e) {

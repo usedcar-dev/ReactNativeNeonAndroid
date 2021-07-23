@@ -213,9 +213,11 @@ public class NormalCameraActivityNeon extends NeonBaseCameraActivity implements 
                 @Override
                 public void onResult(boolean permissionGranted) {
                     if (permissionGranted) {
+/*
                         if (cameraParams == null || cameraParams.getCustomParameters() == null || cameraParams.getCustomParameters().getLocationRestrictive()) {
                             locationTracker.getLocation();
                         }
+*/
                         bindCameraFragment();
 
                     } else {
