@@ -45,6 +45,7 @@ public class LocationHelper extends LocationCallback
     private SettingsClient mSettingsClient;
     private LocationListener tracker;
     private Location location;
+    private boolean locationInProgress = false;
 
     public LocationHelper(AppCompatActivity activity)
     {
@@ -110,6 +111,8 @@ public class LocationHelper extends LocationCallback
     {
         super.onLocationResult(locationResult);
         this.location = locationResult.getLastLocation();
+        LocationHolder.getInstance().setLocation(location);
+        locationInProgress = false;
         if(tracker != null && this.location!=null)
         {
             tracker.onLocationChanged(this.location);
@@ -133,23 +136,20 @@ public class LocationHelper extends LocationCallback
         }
     }
 
+    public void setLocationInProgress(boolean locationInProgress) {
+        this.locationInProgress = locationInProgress;
+    }
+
     private void startLocationUpdates()
     {
         if(null != activity)
         {
-            LocationManager lm = (LocationManager) activity.get().getSystemService(Context.LOCATION_SERVICE);
-            boolean gps_enabled = false;
-            //boolean network_enabled = false;
-
-            try
-            {
-                gps_enabled = lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
+            if(locationInProgress){
+                return;
             }
-            catch(Exception ex)
-            {
-            }
+            locationInProgress = true;
 
-            if(!gps_enabled)
+            if(!isGPSEnabled())
             {
                 activity.get().startActivityForResult(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS), 505);
             }
@@ -166,6 +166,22 @@ public class LocationHelper extends LocationCallback
                 //getLastLocation();
             }
         }
+    }
+
+    public boolean isGPSEnabled(){
+        LocationManager lm = (LocationManager) activity.get().getSystemService(Context.LOCATION_SERVICE);
+        boolean gps_enabled = false;
+        //boolean network_enabled = false;
+
+        try
+        {
+            gps_enabled = lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        }
+        catch(Exception ex)
+        {
+        }
+
+        return gps_enabled;
     }
 
 

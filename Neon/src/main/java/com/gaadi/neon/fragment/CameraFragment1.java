@@ -30,7 +30,6 @@ import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -58,6 +57,7 @@ import com.gaadi.neon.util.Constants;
 import com.gaadi.neon.util.DrawingView;
 import com.gaadi.neon.util.FileInfo;
 import com.gaadi.neon.util.LocationHelper;
+import com.gaadi.neon.util.LocationHolder;
 import com.gaadi.neon.util.NeonImagesHandler;
 import com.gaadi.neon.util.NeonUtils;
 import com.gaadi.neon.util.PrefsUtils;
@@ -110,7 +110,7 @@ public class CameraFragment1 extends Fragment implements View.OnTouchListener, C
     private LinearLayout llFlash;
     private ImageView buttonCaptureHorizontal, buttonCaptureVertical;
     private ImageView maskImg;
-    private Location location;
+//    private Location location;
     private LocationHelper locationTracker;
 
     SensorEventListener sensorEventListener = new SensorEventListener()
@@ -200,8 +200,10 @@ public class CameraFragment1 extends Fragment implements View.OnTouchListener, C
             localCameraFacing = NeonImagesHandler.getSingleonInstance().getCameraParam().getCameraFacing();
         }
         mActivity = getActivity();
+/*
         locationTracker = new LocationHelper((AppCompatActivity) mActivity);
         locationTracker.setLocationListener(this);
+*/
         cameraParam = NeonImagesHandler.getSingleonInstance().getCameraParam();
         if(cameraParam != null)
         {
@@ -215,6 +217,10 @@ public class CameraFragment1 extends Fragment implements View.OnTouchListener, C
         sensorManager = (SensorManager) mActivity.getSystemService(Context.SENSOR_SERVICE);
         fromCreate = true;
         return rootView;
+    }
+
+    public void setLocationTracker(LocationHelper locationTracker) {
+        this.locationTracker = locationTracker;
     }
 
     private void initialize(ViewGroup rootView) {
@@ -259,13 +265,15 @@ public class CameraFragment1 extends Fragment implements View.OnTouchListener, C
 
 
     private void checkLocationAndStartUpdate(){
-        if(locationTracker.checkPermissions())
-        {
-            locationTracker.getLocation();
-        }
-        else
-        {
-            locationTracker.requestPermissions();
+        if(LocationHolder.getInstance().getLocation() == null){
+            if(locationTracker.checkPermissions())
+            {
+                locationTracker.getLocation();
+            }
+            else
+            {
+                locationTracker.requestPermissions();
+            }
         }
     }
 
@@ -286,7 +294,7 @@ public class CameraFragment1 extends Fragment implements View.OnTouchListener, C
     public void onClick(View v) {
         if (v.getId() == R.id.buttonCaptureVertical || v.getId() == R.id.buttonCaptureHorizontal)
         {
-            if(locationRestrictive && location==null)
+            if(locationRestrictive && LocationHolder.getInstance().getLocation()==null)
             {
                 Toast.makeText(getActivity(), "Fetching Location...", Toast.LENGTH_SHORT).show();
             }
@@ -429,7 +437,11 @@ public class CameraFragment1 extends Fragment implements View.OnTouchListener, C
         }
         if(requestCode == LocationHelper.REQUEST_CHECK_SETTINGS)
         {
-            locationTracker.getLocation();
+            /*if(!locationTracker.isGPSEnabled())
+            {
+                locationTracker.setLocationInProgress(false);
+            }
+            locationTracker.getLocation();*/
         }
     }
 
@@ -891,7 +903,7 @@ public class CameraFragment1 extends Fragment implements View.OnTouchListener, C
     @Override
     public void onLocationChanged(Location location)
     {
-        this.location = location;
+//        this.location = location;
     }
 
     public interface PictureTakenListener

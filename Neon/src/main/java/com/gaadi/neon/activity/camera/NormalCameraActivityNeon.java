@@ -44,6 +44,7 @@ import com.gaadi.neon.util.CustomParameters;
 import com.gaadi.neon.util.ExifInterfaceHandling;
 import com.gaadi.neon.util.FileInfo;
 import com.gaadi.neon.util.LocationHelper;
+import com.gaadi.neon.util.LocationHolder;
 import com.gaadi.neon.util.ManifestPermission;
 import com.gaadi.neon.util.NeonException;
 import com.gaadi.neon.util.NeonImagesHandler;
@@ -76,7 +77,7 @@ public class NormalCameraActivityNeon extends NeonBaseCameraActivity implements 
     int currentTag;
     private TextView tvTag, tvNext, tvPrevious, buttonDone, previewTitle;
     private ImageView buttonGallery, showTagPreview, imagePreview, ivPreviewDone, ivPreviewCancel;
-    private Location location;
+//    private Location location;
     private LocationHelper locationTracker;
     private LinearLayout imageHolderView;
     private final int REQ_CODE_CALL_CAMSCANNER = 168;
@@ -197,6 +198,7 @@ public class NormalCameraActivityNeon extends NeonBaseCameraActivity implements 
                         }
 
                         fragment = CameraFragment1.getInstance(locationRestrictive);
+                        fragment.setLocationTracker(locationTracker);
                         FragmentManager manager = getSupportFragmentManager();
                         manager.beginTransaction().replace(R.id.content_frame, fragment).commit();
                     } catch (Exception e) {
@@ -638,7 +640,7 @@ public class NormalCameraActivityNeon extends NeonBaseCameraActivity implements 
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if(requestCode == LocationHelper.REQUEST_PERMISSIONS_REQUEST_CODE && grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
         {
-            locationTracker.getLocation();
+//            locationTracker.getLocation();
         }
     }
 
@@ -653,13 +655,13 @@ public class NormalCameraActivityNeon extends NeonBaseCameraActivity implements 
                 Toast.makeText(this, NeonImagesHandler.getSingletonInstance().getCurrentTag() + " File does not exist", Toast.LENGTH_SHORT).show();
                 return false;
             } else {
-                locationTracker.getLocation();
+//                locationTracker.getLocation();
                 String appName = Constants.getAppName(this);
                 ExifInterfaceHandling exifInterfaceHandling = new ExifInterfaceHandling(file);
-                if(location != null)
+                if(LocationHolder.getInstance().getLocation() != null)
                 {
-                    exifInterfaceHandling.setLocation(location, appName);
-                    if ((String.valueOf(location.getLatitude())).equals(exifInterfaceHandling.getAttribute(ExifInterfaceHandling.TAG_GPS_LATITUDE_REF))) {
+                    exifInterfaceHandling.setLocation(LocationHolder.getInstance().getLocation(), appName);
+                    if ((String.valueOf(LocationHolder.getInstance().getLocation().getLatitude())).equals(exifInterfaceHandling.getAttribute(ExifInterfaceHandling.TAG_GPS_LATITUDE_REF))) {
                         return true;
                     }
                 }
@@ -735,13 +737,31 @@ public class NormalCameraActivityNeon extends NeonBaseCameraActivity implements 
         }
         if(requestCode == LocationHelper.REQUEST_CHECK_SETTINGS)
         {
-            locationTracker.getLocation();
+            locationTracker.setLocationInProgress(false);
+            if(!locationTracker.isGPSEnabled())
+            {
+                Toast.makeText(NormalCameraActivityNeon.this,"Please Enable the location",Toast.LENGTH_LONG).show();
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        locationTracker.getLocation();
+                    }
+                }, 1000);
+            }else{
+                locationTracker.getLocation();
+            }
+
         }
     }
 
     @Override
     public void onLocationChanged(Location location) {
-        this.location = location;
+//        this.location = location;
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        LocationHolder.getInstance().setLocation(null);
+    }
 }
