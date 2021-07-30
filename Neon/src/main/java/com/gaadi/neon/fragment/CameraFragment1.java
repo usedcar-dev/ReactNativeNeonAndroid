@@ -265,7 +265,8 @@ public class CameraFragment1 extends Fragment implements View.OnTouchListener, C
 
 
     private void checkLocationAndStartUpdate(){
-        if(LocationHolder.getInstance().getLocation() == null){
+        if(LocationHolder.getInstance().getLocation() == null && null != locationTracker)
+        {
             if(locationTracker.checkPermissions())
             {
                 locationTracker.getLocation();
