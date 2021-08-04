@@ -27,19 +27,9 @@ public class CustomParameters {
         return latitudeInspectionForm;
     }
 
-    public void setLatitudeInspectionForm(Double latitudeInspectionForm)
-    {
-        this.latitudeInspectionForm = latitudeInspectionForm;
-    }
-
     public Double getLongitudeInspectionForm()
     {
         return longitudeInspectionForm;
-    }
-
-    public void setLongitudeInspectionForm(Double longitudeInspectionForm)
-    {
-        this.longitudeInspectionForm = longitudeInspectionForm;
     }
 
     private CustomParameters(CustomParametersBuilder builder)
@@ -56,6 +46,8 @@ public class CustomParameters {
         this.showTagImage = builder.showTagImage;
         this.camScannerAPIKey = builder.camScannerAPIKey;
         this.showPreviewForEachImage = builder.showPreviewForEachImage;
+        this.latitudeInspectionForm = builder.latitudeInspectionForm;
+        this.longitudeInspectionForm = builder.longitudeInspectionForm;
     }
 
     public boolean gethideCameraButtonInNeutral() {
@@ -125,13 +117,17 @@ public class CustomParameters {
         private boolean showTagImage;
         private String camScannerAPIKey = "";
         private boolean showPreviewForEachImage;
+        private Double latitudeInspectionForm;
+        private Double longitudeInspectionForm;
 
-        public CustomParametersBuilder sethideCameraButtonInNeutral(boolean hide) {
+        public CustomParametersBuilder sethideCameraButtonInNeutral(boolean hide)
+        {
             this.hideCameraButtonInNeutral = hide;
             return this;
         }
 
-        public CustomParametersBuilder setTitleName(String title) {
+        public CustomParametersBuilder setTitleName(String title)
+        {
             this.titleName = title;
             return this;
         }
@@ -176,20 +172,34 @@ public class CustomParameters {
             return this;
         }
 
-        public CustomParametersBuilder setCamScannerAPIKey(String camScannerAPIKey){
+        public CustomParametersBuilder setCamScannerAPIKey(String camScannerAPIKey)
+        {
             this.camScannerAPIKey = camScannerAPIKey;
-            return  this;
+            return this;
         }
 
-        public CustomParametersBuilder setShowPreviewForEachImage(boolean showPreviewForEachImage) {
+        public CustomParametersBuilder setShowPreviewForEachImage(boolean showPreviewForEachImage)
+        {
             this.showPreviewForEachImage = showPreviewForEachImage;
             return this;
         }
 
-        public CustomParameters build() {
+        public CustomParametersBuilder setLatitudeInspectionForm(Double latitudeInspectionForm)
+        {
+            this.latitudeInspectionForm = latitudeInspectionForm;
+            return this;
+        }
+
+        public CustomParametersBuilder setLongitudeInspectionForm(Double longitudeInspectionForm)
+        {
+            this.longitudeInspectionForm = longitudeInspectionForm;
+            return this;
+        }
+
+        public CustomParameters build()
+        {
             CustomParameters user = new CustomParameters(this);
             return user;
         }
-
     }
 }
