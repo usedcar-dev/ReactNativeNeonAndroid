@@ -19,8 +19,31 @@ public class CustomParameters {
     private boolean showTagImage;
     private String camScannerAPIKey;
     private boolean showPreviewForEachImage;
+    private Double latitudeInspectionForm;
+    private Double longitudeInspectionForm;
 
-    private CustomParameters(CustomParametersBuilder builder) {
+    public Double getLatitudeInspectionForm()
+    {
+        return latitudeInspectionForm;
+    }
+
+    public void setLatitudeInspectionForm(Double latitudeInspectionForm)
+    {
+        this.latitudeInspectionForm = latitudeInspectionForm;
+    }
+
+    public Double getLongitudeInspectionForm()
+    {
+        return longitudeInspectionForm;
+    }
+
+    public void setLongitudeInspectionForm(Double longitudeInspectionForm)
+    {
+        this.longitudeInspectionForm = longitudeInspectionForm;
+    }
+
+    private CustomParameters(CustomParametersBuilder builder)
+    {
         this.hideCameraButtonInNeutral = builder.hideCameraButtonInNeutral;
         this.hideGalleryButtonInNeutral = builder.hideGalleryButtonInNeutral;
         this.locationRestrictive = builder.locationRestrictive;

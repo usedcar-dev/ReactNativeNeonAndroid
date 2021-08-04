@@ -24,6 +24,7 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.location.Location;
+import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -264,8 +265,27 @@ public class CameraFragment1 extends Fragment implements View.OnTouchListener, C
     }
 
 
-    private void checkLocationAndStartUpdate(){
-        if(LocationHolder.getInstance().getLocation() == null && null != locationTracker)
+    private void checkLocationAndStartUpdate()
+    {
+        if(NeonImagesHandler.getSingletonInstance().getCameraParam() != null && NeonImagesHandler.getSingletonInstance()
+                .getCameraParam()
+                .getCustomParameters() != null && NeonImagesHandler.getSingletonInstance()
+                .getCameraParam()
+                .getCustomParameters()
+                .getLongitudeInspectionForm() != null && NeonImagesHandler.getSingletonInstance()
+                .getCameraParam()
+                .getCustomParameters()
+                .getLatitudeInspectionForm() != null)
+        {
+            Location location = new Location(LocationManager.GPS_PROVIDER);
+            location.setLatitude(
+                    NeonImagesHandler.getSingletonInstance().getCameraParam().getCustomParameters().getLatitudeInspectionForm());
+            location.setLongitude(
+                    NeonImagesHandler.getSingletonInstance().getCameraParam().getCustomParameters().getLongitudeInspectionForm());
+            location.setTime(System.currentTimeMillis());
+            LocationHolder.getInstance().setLocation(location);
+        }
+        else if(LocationHolder.getInstance().getLocation() == null && null != locationTracker)
         {
             if(locationTracker.checkPermissions())
             {
