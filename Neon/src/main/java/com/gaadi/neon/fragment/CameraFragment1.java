@@ -23,6 +23,7 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
@@ -54,11 +55,11 @@ import com.gaadi.neon.util.CameraPreview;
 import com.gaadi.neon.util.Constants;
 import com.gaadi.neon.util.DrawingView;
 import com.gaadi.neon.util.FileInfo;
-import com.gaadi.neon.util.FindLocations;
 import com.gaadi.neon.util.NeonImagesHandler;
 import com.gaadi.neon.util.NeonUtils;
 import com.gaadi.neon.util.PrefsUtils;
 import com.scanlibrary.R;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -859,18 +860,42 @@ public class CameraFragment1 extends Fragment implements View.OnTouchListener, C
         }
 
 
-        public File savePictureToStorage(Context context) {
+        public File savePictureToStorage(Context context)
+        {
             String folderName = null;
-            if (NeonImagesHandler.getSingletonInstance().getCameraParam() != null && NeonImagesHandler.getSingletonInstance().getCameraParam().getCustomParameters() != null && NeonImagesHandler.getSingletonInstance().getCameraParam().getCustomParameters().getFolderName() != null) {
+            if(NeonImagesHandler.getSingletonInstance().getCameraParam() != null && NeonImagesHandler.getSingletonInstance()
+                    .getCameraParam()
+                    .getCustomParameters() != null && NeonImagesHandler.getSingletonInstance()
+                    .getCameraParam()
+                    .getCustomParameters()
+                    .getFolderName() != null)
+            {
                 folderName = NeonImagesHandler.getSingletonInstance().getCameraParam().getCustomParameters().getFolderName();
             }
-            File pictureFile = Constants.getMediaOutputFile(mActivity, Constants.TYPE_IMAGE, folderName);
-            // Log.d("HIMANSHU FILE=", pictureFile.getAbsolutePath());
-            if (pictureFile == null)
-                return null;
-
-            try {
-                OutputStream fos = new FileOutputStream(pictureFile);
+            File pictureFile = null;
+            try
+            {
+                OutputStream fos = null;
+                OutputStream fileOuputStream = null;
+                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
+                {
+                    fileOuputStream = Constants.getMediaOutputStream(mActivity, Constants.TYPE_IMAGE, folderName);
+                    pictureFile = Constants.getMediaOutputFileNew(mActivity, Constants.TYPE_IMAGE, folderName);
+                    if(pictureFile == null)
+                    {
+                        return null;
+                    }
+                    fos = new FileOutputStream(pictureFile);
+                }
+                else
+                {
+                    pictureFile = Constants.getMediaOutputFile(mActivity, Constants.TYPE_IMAGE, folderName);
+                    if(pictureFile == null)
+                    {
+                        return null;
+                    }
+                    fos = new FileOutputStream(pictureFile);
+                }
                 Bitmap bm;
 
                 // COnverting ByteArray to Bitmap - >Rotate and Convert back to Data
@@ -934,7 +959,9 @@ public class CameraFragment1 extends Fragment implements View.OnTouchListener, C
                 ByteArrayOutputStream stream = new ByteArrayOutputStream();
                 if(setCompressBy > 0) {
                     bm.compress(Bitmap.CompressFormat.JPEG, setCompressBy, stream);
-                } else {
+                }
+                else
+                {
                     bm.compress(Bitmap.CompressFormat.JPEG, 100, stream);
                 }
 
@@ -942,6 +969,13 @@ public class CameraFragment1 extends Fragment implements View.OnTouchListener, C
                 fos.write(byteArray);
                 //fos.write(data);
                 fos.close();
+
+                if(null != fileOuputStream)
+                {
+                    fileOuputStream.write(byteArray);
+                    //fos.write(data);
+                    fileOuputStream.close();
+                }
 
                 /*if (setCompressBy != 0) {
                     NeonUtils.compressImage(setCompressBy, pictureFile.getAbsolutePath(), 1024, 900);

@@ -9,6 +9,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.location.Location;
 import android.media.ThumbnailUtils;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.ActivityCompat;
@@ -211,12 +212,58 @@ public class NormalCameraActivityNeon extends NeonBaseCameraActivity implements 
             askForPermissionIfNeeded(PermissionType.camera, new OnPermissionResultListener() {
                 @Override
                 public void onResult(boolean permissionGranted) {
-                    if (permissionGranted) {
-                        if (cameraParams == null || cameraParams.getCustomParameters() == null || cameraParams.getCustomParameters().getLocationRestrictive()) {
-                            locationTracker.getLocation();
+                    if (permissionGranted)
+                    {
+                        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
+                        {
+                            if(cameraParams == null || cameraParams.getCustomParameters() == null || cameraParams.getCustomParameters()
+                                    .getLocationRestrictive())
+                            {
+                                locationTracker.getLocation();
+                            }
+                            bindCameraFragment();
                         }
-                        bindCameraFragment();
-
+                        else
+                        {
+                            try
+                            {
+                                askForPermissionIfNeeded(PermissionType.write_external_storage, new OnPermissionResultListener()
+                                {
+                                    @Override
+                                    public void onResult(boolean permissionGranted)
+                                    {
+                                        if(permissionGranted)
+                                        {
+                                            if(cameraParams == null || cameraParams.getCustomParameters() == null || cameraParams.getCustomParameters()
+                                                    .getLocationRestrictive())
+                                            {
+                                                locationTracker.getLocation();
+                                            }
+                                            bindCameraFragment();
+                                        }
+                                        else
+                                        {
+                                            if(NeonImagesHandler.getSingletonInstance().isNeutralEnabled())
+                                            {
+                                                finish();
+                                            }
+                                            else
+                                            {
+                                                NeonImagesHandler.getSingletonInstance()
+                                                        .sendImageCollectionAndFinish(NormalCameraActivityNeon.this,
+                                                                                      ResponseCode.Camera_Permission_Error);
+                                            }
+                                            Toast.makeText(NormalCameraActivityNeon.this, R.string.permission_error, Toast.LENGTH_SHORT)
+                                                    .show();
+                                        }
+                                    }
+                                });
+                            }
+                            catch(ManifestPermission manifestPermission)
+                            {
+                                manifestPermission.printStackTrace();
+                            }
+                        }
                     } else {
                         if (NeonImagesHandler.getSingletonInstance().isNeutralEnabled()) {
                             finish();
@@ -564,6 +611,7 @@ public class NormalCameraActivityNeon extends NeonBaseCameraActivity implements 
             }else {
                 previewTitle.setText(R.string.image_preview);
             }
+
             RequestOptions options = new RequestOptions()
                     .diskCacheStrategy(DiskCacheStrategy.NONE)
                     .skipMemoryCache(true)
