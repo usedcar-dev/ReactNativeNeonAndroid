@@ -219,11 +219,11 @@ public class NormalCameraActivityNeon extends NeonBaseCameraActivity implements 
                     {
                         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
                         {
-                            if(cameraParams == null || cameraParams.getCustomParameters() == null || cameraParams.getCustomParameters()
-                                    .getLocationRestrictive())
-                            {
-                                locationTracker.getLocation();
-                            }
+                            //                            if(cameraParams == null || cameraParams.getCustomParameters() == null || cameraParams.getCustomParameters()
+                            //                                    .getLocationRestrictive())
+                            //                            {
+                            //                                locationTracker.getLocation();
+                            //                            }
                             bindCameraFragment();
                         }
                         else
@@ -237,11 +237,11 @@ public class NormalCameraActivityNeon extends NeonBaseCameraActivity implements 
                                     {
                                         if(permissionGranted)
                                         {
-                                            if(cameraParams == null || cameraParams.getCustomParameters() == null || cameraParams.getCustomParameters()
-                                                    .getLocationRestrictive())
-                                            {
-                                                locationTracker.getLocation();
-                                            }
+                                            //                                            if(cameraParams == null || cameraParams.getCustomParameters() == null || cameraParams.getCustomParameters()
+                                            //                                                    .getLocationRestrictive())
+                                            //                                            {
+                                            //                                                locationTracker.getLocation();
+                                            //                                            }
                                             bindCameraFragment();
                                         }
                                         else
