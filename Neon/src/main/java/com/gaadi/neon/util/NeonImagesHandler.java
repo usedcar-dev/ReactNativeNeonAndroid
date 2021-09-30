@@ -184,9 +184,13 @@ public class NeonImagesHandler {
             return false;
         }
         for (int i = 0; i < imagesCollection.size(); i++) {
-            if (imagesCollection.get(i).getFileTag() != null && imagesCollection.get(i).getFileTag().getTagId().equals(tagModel.getTagId()) &&
-                    imagesCollection.get(i).getFileTag().getTagName().equals(tagModel.getTagName())) {
-                return true;
+            try {
+                if (imagesCollection.get(i).getFileTag() != null && imagesCollection.get(i).getFileTag().getTagId().equals(tagModel.getTagId()) &&
+                        imagesCollection.get(i).getFileTag().getTagName().equals(tagModel.getTagName())) {
+                    return true;
+                }
+            }catch (IndexOutOfBoundsException e){
+
             }
         }
         return false;
@@ -197,8 +201,12 @@ public class NeonImagesHandler {
             return false;
         }
         for (int i = 0; i < imagesCollection.size(); i++) {
-            if (imagesCollection.get(i).getFilePath().equalsIgnoreCase(fileInfo.getFilePath())) {
-                return true;
+            try {
+                if (imagesCollection.get(i).getFilePath().equalsIgnoreCase(fileInfo.getFilePath())) {
+                    return true;
+                }
+            }catch (IndexOutOfBoundsException e){
+
             }
         }
         return false;
@@ -209,8 +217,12 @@ public class NeonImagesHandler {
             return true;
         }
         for (int i = 0; i < imagesCollection.size(); i++) {
-            if (imagesCollection.get(i).getFilePath().equals(fileInfo.getFilePath())) {
-                return imagesCollection.remove(i) != null;
+            try {
+                if (imagesCollection.get(i).getFilePath().equals(fileInfo.getFilePath())) {
+                    return imagesCollection.remove(i) != null;
+                }
+            }catch (IndexOutOfBoundsException e){
+
             }
         }
         return true;
@@ -251,16 +263,20 @@ public class NeonImagesHandler {
         HashMap<String, List<FileInfo>> hashMap = new HashMap<>();
 
         for (int i = 0; i < imagesCollection.size(); i++) {
-            FileInfo singleFile = imagesCollection.get(i);
-            if (singleFile.getFileTag() == null) {
-                continue;
-            }
-            if (hashMap.containsKey(singleFile.getFileTag().getTagId())) {
-                hashMap.get(singleFile.getFileTag().getTagId()).add(singleFile);
-            } else {
-                List<FileInfo> singleTagFiles = new ArrayList<>();
-                singleTagFiles.add(singleFile);
-                hashMap.put(singleFile.getFileTag().getTagId(), singleTagFiles);
+            try {
+                FileInfo singleFile = imagesCollection.get(i);
+                if (singleFile.getFileTag() == null) {
+                    continue;
+                }
+                if (hashMap.containsKey(singleFile.getFileTag().getTagId())) {
+                    hashMap.get(singleFile.getFileTag().getTagId()).add(singleFile);
+                } else {
+                    List<FileInfo> singleTagFiles = new ArrayList<>();
+                    singleTagFiles.add(singleFile);
+                    hashMap.put(singleFile.getFileTag().getTagId(), singleTagFiles);
+                }
+            }catch(IndexOutOfBoundsException e){
+
             }
         }
         return hashMap;
