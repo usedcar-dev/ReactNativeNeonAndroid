@@ -10,6 +10,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.media.ExifInterface;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.DisplayMetrics;
@@ -36,6 +37,7 @@ import com.gaadi.neon.model.ImageTagModel;
 import com.gaadi.neon.util.Constants;
 import com.gaadi.neon.util.FileInfo;
 import com.gaadi.neon.util.NeonImagesHandler;
+import com.gaadi.neon.util.NeonUtils;
 import com.scanlibrary.R;
 import com.soundcloud.android.crop.Crop;
 
@@ -241,42 +243,39 @@ public class ImageReviewViewPagerFragment extends Fragment implements View.OnCli
             event.setImageEventType(ImageEditEvent.EVENT_DELETE);
             event.setPosition(mPageNumber);
             warnDeleteDialog(event);
-        } else if (v.getId() == R.id.imagereview_rotatebtn) {
-            if (imageModel.getSource() == FileInfo.SOURCE.PHONE_CAMERA) {
-                rotateImage(imageModel.getFilePath());
-            } else {
-                Toast.makeText(getActivity(), getActivity().getString(R.string.gallery_image_editing_error), Toast.LENGTH_SHORT).show();
-            }
+        } else if (v.getId() == R.id.imagereview_rotatebtn)
+        {
+            rotateImage(imageModel.getFilePath());
         } else if (v.getId() == R.id.imagereview_tag_spinner) {
             showTagsDropDown(v);
         } else if (v.getId() == R.id.imagereview_cropbtn) {
-            if (imageModel.getSource() == FileInfo.SOURCE.PHONE_CAMERA) {
-                Toast.makeText(getActivity(), getActivity().getString(R.string.coming_soon), Toast.LENGTH_SHORT).show();
-            } else {
-                Toast.makeText(getActivity(), getActivity().getString(R.string.gallery_image_editing_error), Toast.LENGTH_SHORT).show();
+            try
+            {
+                cropFilePath = NeonUtils.getEmptyStoragePath(getActivity());
+                Uri inputUri = Uri.fromFile(new File(imageModel.getFilePath()));
+                Uri outputUri = Uri.fromFile(cropFilePath);
+                Crop.of(inputUri, outputUri).start(getActivity(), ImageReviewViewPagerFragment.this);
             }
-//            try {
-//                cropFilePath = NeonUtils.getEmptyStoragePath(getActivity());
-//                //Uri inputUri = Uri.fromFile(new File(imageModel.getFilePath()));
-//                //Uri outputUri = Uri.fromFile(cropFilePath);
-//                Uri inputUri = FileProvider.getUriForFile(getActivity(), NeonUtils.getFileProviderAuthority(getActivity()), new File(imageModel.getFilePath()));
-//                Uri outputUri = FileProvider.getUriForFile(getActivity(), NeonUtils.getFileProviderAuthority(getActivity()), cropFilePath);
-//                Crop.of(inputUri, outputUri).start(getActivity(), ImageReviewViewPagerFragment.this);
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
+            catch(Exception e)
+            {
+                e.printStackTrace();
+            }
         }
     }
 
 
-    private void warnDeleteDialog(final ImageEditEvent event) {
+
+    private void warnDeleteDialog(final ImageEditEvent event)
+    {
         final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle(R.string.remove_img_title);
         builder.setMessage(R.string.removeImage);
         builder.setCancelable(false);
-        builder.setPositiveButton(R.string.okDialog, new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(R.string.okDialog, new DialogInterface.OnClickListener()
+        {
             @Override
-            public void onClick(DialogInterface dialog, int which) {
+            public void onClick(DialogInterface dialog, int which)
+            {
                 if (isAdded())
                     ((FragmentListener) getActivity()).getFragmentChanges(event);
             }

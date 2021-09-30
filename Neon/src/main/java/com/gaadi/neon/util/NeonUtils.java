@@ -10,6 +10,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.hardware.Camera;
@@ -18,6 +19,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.provider.OpenableColumns;
 import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.NotificationCompat;
@@ -34,11 +36,10 @@ import android.view.animation.Transformation;
 import com.scanlibrary.R;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.channels.FileChannel;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -444,32 +445,36 @@ public class NeonUtils {
         return bmOut;
     }
 
-    public static File getEmptyStoragePath(Context ctx) {
-        File mediaFile = null;
+    public static File getEmptyStoragePath(Context ctx)
+    {
+        //        File mediaFile = null;
+        //        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss.SSS").format(new Date());
+        //        String selectedPath = null;
+        //        ArrayList<String> list = (ArrayList) getSdCardPaths(ctx, true);
+        //        for (String path : list) {
+        //
+        //            long freeBytes = new File(path).getFreeSpace();
+        //            if (freeBytes > 5120) {
+        //                selectedPath = path;
+        //                break;
+        //            }
+        //        }
+        //        File externalDir = new File(selectedPath, ctx.getString(R.string.app_name));
+        //        if (!externalDir.exists()) {
+        //            if (!externalDir.mkdir()) {
+        //                //Toast.makeText(ctx,"FAILED externalDir.mkdir() TO CREATE DIRECTORY",Toast.LENGTH_SHORT).show();
+        //                Log.d("MyCameraApp", "failed to create directory");
+        //                return null;
+        //            } else {
+        //                //Toast.makeText(ctx,"SUCCESS to create folder",Toast.LENGTH_SHORT).show();
+        //            }
+        //        }
+        //
+        //        mediaFile = new File(externalDir.getPath() + File.separator +
+        //                "IMG_" + timeStamp + ".jpg");
+        ContextWrapper cw = new ContextWrapper(ctx);
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss.SSS").format(new Date());
-        String selectedPath = null;
-        ArrayList<String> list = (ArrayList) getSdCardPaths(ctx, true);
-        for (String path : list) {
-
-            long freeBytes = new File(path).getFreeSpace();
-            if (freeBytes > 5120) {
-                selectedPath = path;
-                break;
-            }
-        }
-        File externalDir = new File(selectedPath, ctx.getString(R.string.app_name));
-        if (!externalDir.exists()) {
-            if (!externalDir.mkdir()) {
-                //Toast.makeText(ctx,"FAILED externalDir.mkdir() TO CREATE DIRECTORY",Toast.LENGTH_SHORT).show();
-                Log.d("MyCameraApp", "failed to create directory");
-                return null;
-            } else {
-                //Toast.makeText(ctx,"SUCCESS to create folder",Toast.LENGTH_SHORT).show();
-            }
-        }
-
-        mediaFile = new File(externalDir.getPath() + File.separator +
-                "IMG_" + timeStamp + ".jpg");
+        File mediaFile = new File(cw.getExternalCacheDir() + File.separator + "IMG_" + timeStamp + ".jpg");
         return mediaFile;
     }
 
@@ -698,15 +703,80 @@ public class NeonUtils {
         String path;
         if (folderName != null) {
             path = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + appName + File.separator + folderName;
-        } else {
+        }
+        else
+        {
             path = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + appName;
         }
         File mediaStorageDir = new File(path);
         // Create a media file name
         //String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss.SSS").format(new Date());
-        return mediaStorageDir.getPath() + File.separator +
-                "IMG_" + System.currentTimeMillis() + ".jpg";
+        return mediaStorageDir.getPath() + File.separator + "IMG_" + System.currentTimeMillis() + ".jpg";
     }
 
+    public static String copyFileToInternalStorage(Context mContext, Uri uri, String newDirName)
+    {
+        Uri returnUri = uri;
 
+        Cursor returnCursor = mContext.getContentResolver()
+                .query(returnUri, new String[]{OpenableColumns.DISPLAY_NAME, OpenableColumns.SIZE}, null, null, null);
+        if(returnCursor == null)
+        {
+            return null;
+        }
+
+        try
+        {
+            if(returnCursor.moveToFirst())
+            {
+                int nameIndex = returnCursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
+                int sizeIndex = returnCursor.getColumnIndex(OpenableColumns.SIZE);
+                returnCursor.moveToFirst();
+                String name = (returnCursor.getString(nameIndex));
+                String size = (Long.toString(returnCursor.getLong(sizeIndex)));
+
+                File output;
+                if(!newDirName.equals(""))
+                {
+                    File dir = new File(mContext.getFilesDir() + "/" + newDirName);
+                    if(!dir.exists())
+                    {
+                        dir.mkdir();
+                    }
+                    output = new File(mContext.getFilesDir() + "/" + newDirName + "/" + name);
+                }
+                else
+                {
+                    output = new File(mContext.getFilesDir() + "/" + name);
+                }
+                try
+                {
+                    InputStream inputStream = mContext.getContentResolver().openInputStream(uri);
+                    FileOutputStream outputStream = new FileOutputStream(output);
+                    int read = 0;
+                    int bufferSize = 1024;
+                    final byte[] buffers = new byte[bufferSize];
+                    while((read = inputStream.read(buffers)) != -1)
+                    {
+                        outputStream.write(buffers, 0, read);
+                    }
+
+                    inputStream.close();
+                    outputStream.close();
+                }
+                catch(Exception e)
+                {
+
+                    Log.e("Exception", e.getMessage());
+                }
+
+                return output.getPath();
+            }
+        }
+        finally
+        {
+            returnCursor.close();
+        }
+        return null;
+    }
 }

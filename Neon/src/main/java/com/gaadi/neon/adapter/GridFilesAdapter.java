@@ -1,8 +1,10 @@
 package com.gaadi.neon.adapter;
 
 import android.content.Context;
+import android.net.Uri;
 import android.support.media.ExifInterface;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,6 +22,7 @@ import com.gaadi.neon.util.Constants;
 import com.gaadi.neon.util.ExifInterfaceHandling;
 import com.gaadi.neon.util.FileInfo;
 import com.gaadi.neon.util.NeonImagesHandler;
+import com.gaadi.neon.util.NeonUtils;
 import com.google.gson.Gson;
 import com.scanlibrary.R;
 
@@ -115,8 +118,20 @@ public class GridFilesAdapter extends BaseAdapter {
                                     Gson gson = new Gson();
                                     ImageInfo imageInfo = gson.fromJson(exifInterfaceHandling.getAttribute(ExifInterface.TAG_USER_COMMENT), ImageInfo.class);
                                     String artist = exifInterfaceHandling.getAttribute(ExifInterfaceHandling.TAG_ARTIST);
-                                    if (artist != null && (String.valueOf(appName)).equals(artist) && imageInfo.getVccId().equals(NeonImagesHandler.getSingletonInstance().getGenericParam().getCustomParameters().getVccIdAvailable())) {
-                                        if (NeonImagesHandler.getSingletonInstance().putInImageCollection(fileInfos.get(position), context)) {
+                                    if (artist != null && (String.valueOf(appName)).equals(artist) && imageInfo.getVccId().equals(NeonImagesHandler.getSingletonInstance().getGenericParam().getCustomParameters().getVccIdAvailable()))
+                                    {
+                                        FileInfo fi = fileInfos.get(position);
+                                        if(fi.getSource() == FileInfo.SOURCE.PHONE_GALLERY)
+                                        {
+                                            String filePath = NeonUtils.copyFileToInternalStorage(context, Uri.parse(fi.getFilePath()),
+                                                                                                  "Evaluator");
+                                            if(!TextUtils.isEmpty(filePath))
+                                            {
+                                                fi.setFilePath(filePath);
+                                            }
+                                        }
+                                        if(NeonImagesHandler.getSingletonInstance().putInImageCollection(fi, context))
+                                        {
                                             finalFilesHolder.selection_view.setVisibility(View.VISIBLE);
                                             finalFilesHolder.transparentLayer.setVisibility(View.VISIBLE);
                                             ((GridFilesActivity) context).addImageToRecentelySelected(fileInfos.get(position));
@@ -140,8 +155,20 @@ public class GridFilesAdapter extends BaseAdapter {
                             try {
                                 ExifInterfaceHandling exifInterfaceHandling = new ExifInterfaceHandling(file);
                                 String artist = exifInterfaceHandling.getAttribute(ExifInterfaceHandling.TAG_ARTIST);
-                                if (artist != null && (String.valueOf(appName)).equals(artist)) {
-                                    if (NeonImagesHandler.getSingletonInstance().putInImageCollection(fileInfos.get(position), context)) {
+                                if (artist != null && (String.valueOf(appName)).equals(artist))
+                                {
+                                    FileInfo fi = fileInfos.get(position);
+                                    if(fi.getSource() == FileInfo.SOURCE.PHONE_GALLERY)
+                                    {
+                                        String filePath = NeonUtils.copyFileToInternalStorage(context, Uri.parse(fi.getFilePath()),
+                                                                                              "Evaluator");
+                                        if(!TextUtils.isEmpty(filePath))
+                                        {
+                                            fi.setFilePath(filePath);
+                                        }
+                                    }
+                                    if(NeonImagesHandler.getSingletonInstance().putInImageCollection(fi, context))
+                                    {
                                         finalFilesHolder.selection_view.setVisibility(View.VISIBLE);
                                         finalFilesHolder.transparentLayer.setVisibility(View.VISIBLE);
                                         ((GridFilesActivity) context).addImageToRecentelySelected(fileInfos.get(position));
@@ -154,8 +181,19 @@ public class GridFilesAdapter extends BaseAdapter {
                             }
                         }
 
-                    } else {
-                        if (NeonImagesHandler.getSingletonInstance().putInImageCollection(fileInfos.get(position), context)) {
+                    } else
+                    {
+                        FileInfo fi = fileInfos.get(position);
+                        if(fi.getSource() == FileInfo.SOURCE.PHONE_GALLERY)
+                        {
+                            String filePath = NeonUtils.copyFileToInternalStorage(context, Uri.parse(fi.getFilePath()), "Evaluator");
+                            if(!TextUtils.isEmpty(filePath))
+                            {
+                                fi.setFilePath(filePath);
+                            }
+                        }
+                        if(NeonImagesHandler.getSingletonInstance().putInImageCollection(fi, context))
+                        {
                             finalFilesHolder.selection_view.setVisibility(View.VISIBLE);
                             finalFilesHolder.transparentLayer.setVisibility(View.VISIBLE);
                             ((GridFilesActivity) context).addImageToRecentelySelected(fileInfos.get(position));
