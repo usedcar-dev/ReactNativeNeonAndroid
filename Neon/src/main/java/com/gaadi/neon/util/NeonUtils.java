@@ -1,5 +1,7 @@
 package com.gaadi.neon.util;
 
+import static android.content.ContentValues.TAG;
+
 import android.app.Activity;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -13,6 +15,7 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.Path;
 import android.hardware.Camera;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
@@ -36,10 +39,14 @@ import android.view.animation.Transformation;
 import com.scanlibrary.R;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -628,7 +635,8 @@ public class NeonUtils {
 
     }
 
-    public static void copyFile(Context context,String sourcePath, File destFile) {
+    /*public static void copyFile(Context context,String sourcePath, File destFile) {
+        Log.d(TAG, "copyFile: "+context+" "+sourcePath+ " "+ destFile);
 
         if (!destFile.exists()) {
             try {
@@ -662,7 +670,41 @@ public class NeonUtils {
                 }
             }
         }
+    }*/
+
+    public static void copyFile(Context context,String sourcePath, File destFile) {
+
+        InputStream in = null;
+        OutputStream out = null;
+        try {
+            in = new FileInputStream(sourcePath);
+            out = new FileOutputStream(destFile);
+
+            byte[] buffer = new byte[1024];
+            int read;
+            while ((read = in.read(buffer)) != -1) {
+                out.write(buffer, 0, read);
+            }
+            in.close();
+            in = null;
+
+            // write the output file (You have now copied the file)
+            out.flush();
+            out.close();
+            out = null;
+
+         //   LOGGER.debug("Copied file to " + outputPath);
+            Log.d(TAG, "copyFile: ");
+
+        } catch (FileNotFoundException fnfe1) {
+           // LOGGER.error(fnfe1.getMessage());
+            Log.d(TAG, "copyFile: 1"+fnfe1.getMessage());
+        } catch (Exception e) {
+            //LOGGER.error("tag", e.getMessage());
+            Log.d(TAG, "copyFile: 2"+e.getMessage());
+        }
     }
+
 
     public static File getImageOutputFile(Context context, String originalPath, String folderName, String imageName, int index) {
         if (imageName == null) {
