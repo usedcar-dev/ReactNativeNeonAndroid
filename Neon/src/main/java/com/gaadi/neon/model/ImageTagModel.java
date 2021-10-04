@@ -17,6 +17,7 @@ public class ImageTagModel implements Serializable {
     private int numberOfPhotos;
     private Location location;
     private String tagPreviewUrl;
+    private String maskUrl;
 
     public ImageTagModel() {
     }
@@ -57,6 +58,14 @@ public class ImageTagModel implements Serializable {
         this.numberOfPhotos = _numberOfPhotos;
         this.location = _location;
         this.tagPreviewUrl = imageUrl;
+    }
+
+    public String getMaskUrl() {
+        return maskUrl;
+    }
+
+    public void setMaskUrl(String maskUrl) {
+        this.maskUrl = maskUrl;
     }
 
     public String getTagPreviewUrl() {

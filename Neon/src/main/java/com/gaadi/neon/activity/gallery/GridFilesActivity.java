@@ -237,7 +237,7 @@ public class GridFilesActivity extends NeonBaseGalleryActivity {
 
     private void bindXml() {
         try {
-            askForPermissionIfNeeded(PermissionType.write_external_storage, new OnPermissionResultListener() {
+            askForPermissionIfNeeded(PermissionType.read_external_storage, new OnPermissionResultListener() {
                 @Override
                 public void onResult(boolean permissionGranted) {
                     if (permissionGranted) {

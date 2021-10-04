@@ -1,5 +1,6 @@
 package com.gaadi.neon.activity.camera;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -8,8 +9,11 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.location.Location;
 import android.media.ThumbnailUtils;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.text.TextUtils;
 import android.util.Log;
@@ -41,6 +45,7 @@ import com.gaadi.neon.util.CustomParameters;
 import com.gaadi.neon.util.ExifInterfaceHandling;
 import com.gaadi.neon.util.FileInfo;
 import com.gaadi.neon.util.LocationHelper;
+import com.gaadi.neon.util.LocationHolder;
 import com.gaadi.neon.util.ManifestPermission;
 import com.gaadi.neon.util.NeonException;
 import com.gaadi.neon.util.NeonImagesHandler;
@@ -73,7 +78,7 @@ public class NormalCameraActivityNeon extends NeonBaseCameraActivity implements 
     int currentTag;
     private TextView tvTag, tvNext, tvPrevious, buttonDone, previewTitle;
     private ImageView buttonGallery, showTagPreview, imagePreview, ivPreviewDone, ivPreviewCancel;
-    private Location location;
+//    private Location location;
     private LocationHelper locationTracker;
     private LinearLayout imageHolderView;
     private final int REQ_CODE_CALL_CAMSCANNER = 168;
@@ -82,6 +87,7 @@ public class NormalCameraActivityNeon extends NeonBaseCameraActivity implements 
     private CSOpenAPI camScannerApi;
     private boolean isPreviewVisible;
     private String filePathToReview;
+    private CameraFragment1 fragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -113,8 +119,8 @@ public class NormalCameraActivityNeon extends NeonBaseCameraActivity implements 
         } else {
             buttonDone.setVisibility(View.VISIBLE);
         }
+//        bindCameraFragment();
         customize();
-        bindCameraFragment();
 
         locationTracker = new LocationHelper(NormalCameraActivityNeon.this);
         locationTracker.setLocationListener(this);
@@ -126,10 +132,36 @@ public class NormalCameraActivityNeon extends NeonBaseCameraActivity implements 
         if (NeonImagesHandler.getSingletonInstance().getLivePhotosListener() != null) {
             NeonImagesHandler.getSingletonInstance().setLivePhotoNextTagListener(this);
         }
-        if (cameraParams == null || cameraParams.getCustomParameters() == null || cameraParams.getCustomParameters().getLocationRestrictive()) {
-            locationTracker.getLocation();
-        }
+        askPermission();
         showTagImages();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        showTagImages();
+        bindCameraFragment();
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                initializeOverlay();
+            }
+        }, 1500);
+    }
+
+    private void initializeOverlay(){
+        if (null != tagModels) {
+            ImageTagModel singleTagModel = tagModels.get(currentTag);
+            setTag(singleTagModel, true);
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        for (Fragment fragment : getSupportFragmentManager().getFragments()) {
+            getSupportFragmentManager().beginTransaction().remove(fragment).commit();
+        }
     }
 
 
@@ -155,29 +187,86 @@ public class NormalCameraActivityNeon extends NeonBaseCameraActivity implements 
     }
 
     private void bindCameraFragment() {
+        int permissionState = ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
+        if (permissionState == PackageManager.PERMISSION_GRANTED) {
+            new Handler().post(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        boolean locationRestrictive = true;
+                        if (cameraParams != null && cameraParams.getCustomParameters() != null) {
+                            locationRestrictive = cameraParams.getCustomParameters().getLocationRestrictive();
+                        }
+
+                        fragment = CameraFragment1.getInstance(locationRestrictive);
+                        fragment.setLocationTracker(locationTracker);
+                        FragmentManager manager = getSupportFragmentManager();
+                        manager.beginTransaction().replace(R.id.content_frame, fragment).commit();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+        }
+    }
+
+    private void askPermission() {
         try {
             askForPermissionIfNeeded(PermissionType.camera, new OnPermissionResultListener() {
                 @Override
                 public void onResult(boolean permissionGranted) {
-                    if (permissionGranted) {
-                        new Handler().post(new Runnable() {
-                            @Override
-                            public void run() {
-                                try {
-                                    boolean locationRestrictive = true;
-                                    if (cameraParams != null && cameraParams.getCustomParameters() != null) {
-                                        locationRestrictive = cameraParams.getCustomParameters().getLocationRestrictive();
+                    if (permissionGranted)
+                    {
+                        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
+                        {
+                            //                            if(cameraParams == null || cameraParams.getCustomParameters() == null || cameraParams.getCustomParameters()
+                            //                                    .getLocationRestrictive())
+                            //                            {
+                            //                                locationTracker.getLocation();
+                            //                            }
+                            bindCameraFragment();
+                        }
+                        else
+                        {
+                            try
+                            {
+                                askForPermissionIfNeeded(PermissionType.write_external_storage, new OnPermissionResultListener()
+                                {
+                                    @Override
+                                    public void onResult(boolean permissionGranted)
+                                    {
+                                        if(permissionGranted)
+                                        {
+                                            //                                            if(cameraParams == null || cameraParams.getCustomParameters() == null || cameraParams.getCustomParameters()
+                                            //                                                    .getLocationRestrictive())
+                                            //                                            {
+                                            //                                                locationTracker.getLocation();
+                                            //                                            }
+                                            bindCameraFragment();
+                                        }
+                                        else
+                                        {
+                                            if(NeonImagesHandler.getSingletonInstance().isNeutralEnabled())
+                                            {
+                                                finish();
+                                            }
+                                            else
+                                            {
+                                                NeonImagesHandler.getSingletonInstance()
+                                                        .sendImageCollectionAndFinish(NormalCameraActivityNeon.this,
+                                                                                      ResponseCode.Camera_Permission_Error);
+                                            }
+                                            Toast.makeText(NormalCameraActivityNeon.this, R.string.permission_error, Toast.LENGTH_SHORT)
+                                                    .show();
+                                        }
                                     }
-
-                                    CameraFragment1 fragment = CameraFragment1.getInstance(locationRestrictive);
-                                    FragmentManager manager = getSupportFragmentManager();
-                                    manager.beginTransaction().replace(R.id.content_frame, fragment).commit();
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                }
+                                });
                             }
-                        });
-
+                            catch(ManifestPermission manifestPermission)
+                            {
+                                manifestPermission.printStackTrace();
+                            }
+                        }
                     } else {
                         if (NeonImagesHandler.getSingletonInstance().isNeutralEnabled()) {
                             finish();
@@ -395,7 +484,10 @@ public class NormalCameraActivityNeon extends NeonBaseCameraActivity implements 
         return tagModels.get(currentTag);
     }
 
-    public void setTag(ImageTagModel imageTagModel, boolean rightToLeft) {
+    public void setTag(final ImageTagModel imageTagModel, boolean rightToLeft) {
+        if (fragment != null) {
+            fragment.setMask(imageTagModel.getMaskUrl());
+        }
         // need to update both view and internal data @ the same time, animation may delay this.
         String tag = imageTagModel.isMandatory() ? "*" + imageTagModel.getTagName() : imageTagModel.getTagName();
         tvTag.setText(tag);
@@ -522,6 +614,7 @@ public class NormalCameraActivityNeon extends NeonBaseCameraActivity implements 
             }else {
                 previewTitle.setText(R.string.image_preview);
             }
+
             RequestOptions options = new RequestOptions()
                     .diskCacheStrategy(DiskCacheStrategy.NONE)
                     .skipMemoryCache(true)
@@ -585,8 +678,6 @@ public class NormalCameraActivityNeon extends NeonBaseCameraActivity implements 
     protected void onStop()
     {
         super.onStop();
-        locationTracker.stopLocationUpdates();
-        locationTracker.setLocationListener(null);
     }
 
     @Override
@@ -595,7 +686,7 @@ public class NormalCameraActivityNeon extends NeonBaseCameraActivity implements 
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if(requestCode == LocationHelper.REQUEST_PERMISSIONS_REQUEST_CODE && grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
         {
-            locationTracker.getLocation();
+//            locationTracker.getLocation();
         }
     }
 
@@ -610,12 +701,13 @@ public class NormalCameraActivityNeon extends NeonBaseCameraActivity implements 
                 Toast.makeText(this, NeonImagesHandler.getSingletonInstance().getCurrentTag() + " File does not exist", Toast.LENGTH_SHORT).show();
                 return false;
             } else {
+//                locationTracker.getLocation();
                 String appName = Constants.getAppName(this);
                 ExifInterfaceHandling exifInterfaceHandling = new ExifInterfaceHandling(file);
-                if(location != null)
+                if(LocationHolder.getInstance().getLocation() != null)
                 {
-                    exifInterfaceHandling.setLocation(location, appName);
-                    if ((String.valueOf(location.getLatitude())).equals(exifInterfaceHandling.getAttribute(ExifInterfaceHandling.TAG_GPS_LATITUDE_REF))) {
+                    exifInterfaceHandling.setLocation(LocationHolder.getInstance().getLocation(), appName);
+                    if ((String.valueOf(LocationHolder.getInstance().getLocation().getLatitude())).equals(exifInterfaceHandling.getAttribute(ExifInterfaceHandling.TAG_GPS_LATITUDE_REF))) {
                         return true;
                     }
                 }
@@ -679,22 +771,43 @@ public class NormalCameraActivityNeon extends NeonBaseCameraActivity implements 
                         Log.d("NormalCamera", "onError: "+i);
                         afterPictureTaken(mInputImagePath);
                     }
+
                     @Override
-                    public void onCancel() {
+                    public void onCancel()
+                    {
                         Log.d("NormalCamera", "onCancel: ");
                         afterPictureTaken(mInputImagePath);
                     }
                 });
             }
         }
-        if(requestCode == LocationHelper.REQUEST_CHECK_SETTINGS && resultCode == RESULT_OK)
+        if(requestCode == LocationHelper.REQUEST_CHECK_SETTINGS)
         {
-            locationTracker.getLocation();
+            locationTracker.setLocationInProgress(false);
+            if(!locationTracker.isGPSEnabled())
+            {
+                Toast.makeText(NormalCameraActivityNeon.this,"Please Enable the location",Toast.LENGTH_LONG).show();
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        locationTracker.getLocation();
+                    }
+                }, 1000);
+            }else{
+                locationTracker.getLocation();
+            }
+
         }
     }
 
     @Override
     public void onLocationChanged(Location location) {
-        this.location = location;
+//        this.location = location;
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        LocationHolder.getInstance().setLocation(null);
     }
 }

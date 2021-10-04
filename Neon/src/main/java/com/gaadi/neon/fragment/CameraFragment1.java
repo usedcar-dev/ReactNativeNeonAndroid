@@ -11,6 +11,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -22,7 +23,10 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
@@ -30,6 +34,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -42,6 +47,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.gaadi.neon.activity.ImageReviewActivity;
 import com.gaadi.neon.adapter.FlashModeRecyclerHorizontalAdapter;
 import com.gaadi.neon.enumerations.CameraFacing;
@@ -52,11 +58,14 @@ import com.gaadi.neon.util.CameraPreview;
 import com.gaadi.neon.util.Constants;
 import com.gaadi.neon.util.DrawingView;
 import com.gaadi.neon.util.FileInfo;
-import com.gaadi.neon.util.FindLocations;
+import com.gaadi.neon.util.LocationHelper;
+import com.gaadi.neon.util.LocationHolder;
 import com.gaadi.neon.util.NeonImagesHandler;
 import com.gaadi.neon.util.NeonUtils;
 import com.gaadi.neon.util.PrefsUtils;
+import com.google.android.gms.location.LocationListener;
 import com.scanlibrary.R;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -68,7 +77,9 @@ import java.util.List;
 import java.util.Map;
 
 @SuppressWarnings("deprecation,unchecked")
-public class CameraFragment1 extends Fragment implements View.OnTouchListener, Camera.PictureCallback, View.OnClickListener {
+public class CameraFragment1 extends Fragment implements View.OnTouchListener, Camera.PictureCallback, View.OnClickListener,
+        LocationListener
+{
 
     private static final String TAG = "CameraFragment1";
     private static final int REQUEST_REVIEW = 100;
@@ -100,11 +111,19 @@ public class CameraFragment1 extends Fragment implements View.OnTouchListener, C
     private float last_x, last_y, last_z;
     private LinearLayout llFlash;
     private ImageView buttonCaptureHorizontal, buttonCaptureVertical;
-    SensorEventListener sensorEventListener = new SensorEventListener() {
+    private ImageView maskImg;
+//    private Location location;
+    private LocationHelper locationTracker;
+
+    SensorEventListener sensorEventListener = new SensorEventListener()
+    {
         @Override
-        public void onSensorChanged(SensorEvent event) {
-            try {
-                if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+        public void onSensorChanged(SensorEvent event)
+        {
+            try
+            {
+                if(event.sensor.getType() == Sensor.TYPE_ACCELEROMETER)
+                {
                     mGravity = event.values.clone();
                     // Shake detection
                     float x = mGravity[0];
@@ -173,24 +192,37 @@ public class CameraFragment1 extends Fragment implements View.OnTouchListener, C
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        ViewGroup rootView = (ViewGroup) inflater
-                .inflate(R.layout.neon_camera_fragment_layout, container, false);
-        if (NeonImagesHandler.getSingleonInstance().getCameraParam() != null &&
-                NeonImagesHandler.getSingleonInstance().getCameraParam().getCameraFacing() != null) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+    {
+        ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.neon_camera_fragment_layout, container, false);
+        if(NeonImagesHandler.getSingleonInstance().getCameraParam() != null && NeonImagesHandler.getSingleonInstance()
+                .getCameraParam()
+                .getCameraFacing() != null)
+        {
             localCameraFacing = NeonImagesHandler.getSingleonInstance().getCameraParam().getCameraFacing();
         }
         mActivity = getActivity();
+/*
+        locationTracker = new LocationHelper((AppCompatActivity) mActivity);
+        locationTracker.setLocationListener(this);
+*/
         cameraParam = NeonImagesHandler.getSingleonInstance().getCameraParam();
-        if (cameraParam != null) {
+        if(cameraParam != null)
+        {
             initialize(rootView);
             customize();
-        } else {
+        }
+        else
+        {
             Toast.makeText(getContext(), getString(R.string.pass_params), Toast.LENGTH_SHORT).show();
         }
         sensorManager = (SensorManager) mActivity.getSystemService(Context.SENSOR_SERVICE);
         fromCreate = true;
         return rootView;
+    }
+
+    public void setLocationTracker(LocationHelper locationTracker) {
+        this.locationTracker = locationTracker;
     }
 
     private void initialize(ViewGroup rootView) {
@@ -203,6 +235,8 @@ public class CameraFragment1 extends Fragment implements View.OnTouchListener, C
         mCameraLayout = rootView.findViewById(R.id.camera_preview);
         buttonCaptureHorizontal = rootView.findViewById(R.id.buttonCaptureHorizontal);
         buttonCaptureVertical = rootView.findViewById(R.id.buttonCaptureVertical);
+        maskImg = rootView.findViewById(R.id.maskImg);
+
         currentFlashMode.setOnClickListener(this);
         buttonCaptureVertical.setOnClickListener(this);
         buttonCaptureHorizontal.setOnClickListener(this);
@@ -228,29 +262,74 @@ public class CameraFragment1 extends Fragment implements View.OnTouchListener, C
             setCompressBy = NeonImagesHandler.getSingletonInstance().getCameraParam().getCustomParameters().getCompressBy();
         }
 
+        checkLocationAndStartUpdate();
     }
 
+
+    private void checkLocationAndStartUpdate()
+    {
+        if(NeonImagesHandler.getSingletonInstance().getCameraParam() != null && NeonImagesHandler.getSingletonInstance()
+                .getCameraParam()
+                .getCustomParameters() != null && NeonImagesHandler.getSingletonInstance()
+                .getCameraParam()
+                .getCustomParameters()
+                .getLongitudeInspectionForm() != null && NeonImagesHandler.getSingletonInstance()
+                .getCameraParam()
+                .getCustomParameters()
+                .getLatitudeInspectionForm() != null)
+        {
+            Location location = new Location(LocationManager.GPS_PROVIDER);
+            location.setLatitude(
+                    NeonImagesHandler.getSingletonInstance().getCameraParam().getCustomParameters().getLatitudeInspectionForm());
+            location.setLongitude(
+                    NeonImagesHandler.getSingletonInstance().getCameraParam().getCustomParameters().getLongitudeInspectionForm());
+            location.setTime(System.currentTimeMillis());
+            LocationHolder.getInstance().setLocation(location);
+        }
+        else if(LocationHolder.getInstance().getLocation() == null && null != locationTracker)
+        {
+            if(locationTracker.checkPermissions())
+            {
+                locationTracker.getLocation();
+            }
+            else
+            {
+                locationTracker.requestPermissions();
+            }
+        }
+    }
+
+    public void setMask(String maskUrl) {
+        if(isAdded()){
+            if(!TextUtils.isEmpty(maskUrl)){
+                Glide.with(this)
+                        .load(maskUrl)
+                        .into(maskImg);
+            }else{
+                Glide.with(this)
+                        .clear(maskImg);
+            }
+        }
+    }
+
+
     public void onClick(View v) {
-        if (v.getId() == R.id.buttonCaptureVertical || v.getId() == R.id.buttonCaptureHorizontal) {
-            /*if (locationRestrictive) {
-                if (FindLocations.getInstance().checkPermissions(mActivity) &&
-                        FindLocations.getInstance().getLocation() != null) {
-                    clickPicture();
-
-                } else {
-                    Toast.makeText(mActivity, "Failed to get location.Please try again later.", Toast.LENGTH_SHORT).show();
-                }
-
-            } else {
+        if (v.getId() == R.id.buttonCaptureVertical || v.getId() == R.id.buttonCaptureHorizontal)
+        {
+            if(locationRestrictive && LocationHolder.getInstance().getLocation()==null)
+            {
+                Toast.makeText(getActivity(), "Fetching Location...", Toast.LENGTH_SHORT).show();
+            }
+            else
+            {
                 clickPicture();
-            }*/
-            clickPicture();
-//            if (!locationRestrictive || (FindLocations.getInstance().checkPermissions(mActivity) &&
-//                    FindLocations.getInstance().getLocation() != null)) {
-//                clickPicture();
-//            } else {
-//                Toast.makeText(getActivity(), "Failed to get location.Please try again later.", Toast.LENGTH_SHORT).show();
-//            }
+            }
+            //            if (!locationRestrictive || (FindLocations.getInstance().checkPermissions(mActivity) &&
+            //                    FindLocations.getInstance().getLocation() != null)) {
+            //                clickPicture();
+            //            } else {
+            //                Toast.makeText(getActivity(), "Failed to get location.Please try again later.", Toast.LENGTH_SHORT).show();
+            //            }
 
         } else if (v.getId() == R.id.switchCamera) {
             int cameraFacing = initCameraId();
@@ -364,15 +443,27 @@ public class CameraFragment1 extends Fragment implements View.OnTouchListener, C
         super.onActivityResult(requestCode, resultCode, data);
 
         if (resultCode == Activity.RESULT_OK) {
-            if (requestCode == REQUEST_REVIEW) {
+            if(requestCode == REQUEST_REVIEW)
+            {
                 String capturedFilePath = "";
                 mPictureTakenListener.onPictureTaken(capturedFilePath);
             }
-        } else {
-            if (requestCode != 101) {
+        }
+        else
+        {
+            if(requestCode != 101)
+            {
                 mActivity.setResult(resultCode);
                 mActivity.finish();
             }
+        }
+        if(requestCode == LocationHelper.REQUEST_CHECK_SETTINGS)
+        {
+            /*if(!locationTracker.isGPSEnabled())
+            {
+                locationTracker.setLocationInProgress(false);
+            }
+            locationTracker.getLocation();*/
         }
     }
 
@@ -671,22 +762,37 @@ public class CameraFragment1 extends Fragment implements View.OnTouchListener, C
             mCamera.release();
             mCamera = null;
             mCameraPreview = null;
-        } catch (Exception e) {
+        }
+        catch(Exception e)
+        {
             Log.e(TAG, e.getMessage());
         }
     }
 
     @Override
-    public void onDestroyView() {
+    public void onDestroyView()
+    {
         super.onDestroyView();
         stopCamera();
     }
 
-    private void startCamera(int cameraFacing) {
-        if (mCamera == null) {
-            try {
-                mCamera = Camera.open(cameraFacing);
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults)
+    {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if(requestCode == LocationHelper.REQUEST_PERMISSIONS_REQUEST_CODE && grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+        {
+            locationTracker.getLocation();
+        }
+    }
 
+    private void startCamera(int cameraFacing)
+    {
+        if(mCamera == null)
+        {
+            try
+            {
+                mCamera = Camera.open(cameraFacing);
 
                 //To set hardware camera rotation
                 setCameraRotation();
@@ -806,7 +912,8 @@ public class CameraFragment1 extends Fragment implements View.OnTouchListener, C
         return cameraId;
     }
 
-    public static CameraFragment1 getInstance(boolean locationRestrictive) {
+    public static CameraFragment1 getInstance(boolean locationRestrictive)
+    {
 
         CameraFragment1 fragment = new CameraFragment1();
         Bundle bundle = new Bundle();
@@ -815,7 +922,14 @@ public class CameraFragment1 extends Fragment implements View.OnTouchListener, C
         return fragment;
     }
 
-    public interface PictureTakenListener {
+    @Override
+    public void onLocationChanged(Location location)
+    {
+//        this.location = location;
+    }
+
+    public interface PictureTakenListener
+    {
         void onPictureTaken(String filePath);
 
         void onPicturesFinalized(ArrayList<FileInfo> infos);
@@ -823,7 +937,8 @@ public class CameraFragment1 extends Fragment implements View.OnTouchListener, C
         void onPicturesFinalized(Map<ImageTagModel, List<FileInfo>> filesMap);
     }
 
-    public interface SetOnPictureTaken {
+    public interface SetOnPictureTaken
+    {
         void onPictureTaken(String filePath);
     }
 
@@ -839,18 +954,42 @@ public class CameraFragment1 extends Fragment implements View.OnTouchListener, C
         }
 
 
-        public File savePictureToStorage(Context context) {
+        public File savePictureToStorage(Context context)
+        {
             String folderName = null;
-            if (NeonImagesHandler.getSingletonInstance().getCameraParam() != null && NeonImagesHandler.getSingletonInstance().getCameraParam().getCustomParameters() != null && NeonImagesHandler.getSingletonInstance().getCameraParam().getCustomParameters().getFolderName() != null) {
+            if(NeonImagesHandler.getSingletonInstance().getCameraParam() != null && NeonImagesHandler.getSingletonInstance()
+                    .getCameraParam()
+                    .getCustomParameters() != null && NeonImagesHandler.getSingletonInstance()
+                    .getCameraParam()
+                    .getCustomParameters()
+                    .getFolderName() != null)
+            {
                 folderName = NeonImagesHandler.getSingletonInstance().getCameraParam().getCustomParameters().getFolderName();
             }
-            File pictureFile = Constants.getMediaOutputFile(mActivity, Constants.TYPE_IMAGE, folderName);
-            // Log.d("HIMANSHU FILE=", pictureFile.getAbsolutePath());
-            if (pictureFile == null)
-                return null;
-
-            try {
-                OutputStream fos = new FileOutputStream(pictureFile);
+            File pictureFile = null;
+            try
+            {
+                OutputStream fos = null;
+                OutputStream fileOuputStream = null;
+                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
+                {
+                    fileOuputStream = Constants.getMediaOutputStream(mActivity, Constants.TYPE_IMAGE, folderName);
+                    pictureFile = Constants.getMediaOutputFileNew(mActivity, Constants.TYPE_IMAGE, folderName);
+                    if(pictureFile == null)
+                    {
+                        return null;
+                    }
+                    fos = new FileOutputStream(pictureFile);
+                }
+                else
+                {
+                    pictureFile = Constants.getMediaOutputFile(mActivity, Constants.TYPE_IMAGE, folderName);
+                    if(pictureFile == null)
+                    {
+                        return null;
+                    }
+                    fos = new FileOutputStream(pictureFile);
+                }
                 Bitmap bm;
 
                 // COnverting ByteArray to Bitmap - >Rotate and Convert back to Data
@@ -914,7 +1053,9 @@ public class CameraFragment1 extends Fragment implements View.OnTouchListener, C
                 ByteArrayOutputStream stream = new ByteArrayOutputStream();
                 if(setCompressBy > 0) {
                     bm.compress(Bitmap.CompressFormat.JPEG, setCompressBy, stream);
-                } else {
+                }
+                else
+                {
                     bm.compress(Bitmap.CompressFormat.JPEG, 100, stream);
                 }
 
@@ -922,6 +1063,13 @@ public class CameraFragment1 extends Fragment implements View.OnTouchListener, C
                 fos.write(byteArray);
                 //fos.write(data);
                 fos.close();
+
+                if(null != fileOuputStream)
+                {
+                    fileOuputStream.write(byteArray);
+                    //fos.write(data);
+                    fileOuputStream.close();
+                }
 
                 /*if (setCompressBy != 0) {
                     NeonUtils.compressImage(setCompressBy, pictureFile.getAbsolutePath(), 1024, 900);

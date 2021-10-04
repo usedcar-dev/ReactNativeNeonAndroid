@@ -80,7 +80,7 @@ public class ImagesFoldersAdapter extends BaseAdapter {
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .centerCrop()
                 .placeholder(R.drawable.default_placeholder);
-        Glide.with(context).load("file://" + folders.get(position).getBucketCoverImagePath())
+        Glide.with(context).load(folders.get(position).getBucketCoverImagePath())
                 .apply(options)
                 .into(holder.imageView);
 

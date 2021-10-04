@@ -1,15 +1,18 @@
 package com.gaadi.neon.util;
 
 import android.Manifest;
-import android.content.IntentSender;
+import android.annotation.SuppressLint;
+import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Looper;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
-import com.google.android.gms.common.api.ApiException;
-import com.google.android.gms.common.api.ResolvableApiException;
+
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationListener;
@@ -17,8 +20,6 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
-import com.google.android.gms.location.LocationSettingsResponse;
-import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.google.android.gms.location.SettingsClient;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -29,7 +30,8 @@ import java.lang.ref.WeakReference;
  * Created by salman on 2/1/18.
  */
 
-public class LocationHelper extends LocationCallback {
+public class LocationHelper extends LocationCallback
+{
 
     public static final int REQUEST_CHECK_SETTINGS = 505;
     public static final int REQUEST_PERMISSIONS_REQUEST_CODE = 606;
@@ -42,9 +44,11 @@ public class LocationHelper extends LocationCallback {
     private FusedLocationProviderClient mFusedLocationClient;
     private SettingsClient mSettingsClient;
     private LocationListener tracker;
+    private Location location;
+    private boolean locationInProgress = false;
 
-
-    public LocationHelper(AppCompatActivity activity) {
+    public LocationHelper(AppCompatActivity activity)
+    {
         this.activity = new WeakReference<>(activity);
 
         //setup LocationRequest
@@ -61,90 +65,127 @@ public class LocationHelper extends LocationCallback {
         mLocationSettingsRequest = builder.build();
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(activity);
         mSettingsClient = LocationServices.getSettingsClient(activity);
-
-
     }
 
-    public void getLocation() {
-
-        if (checkPermissions()) {
+    public void getLocation()
+    {
+        if(this.location!=null && tracker!=null){
+            tracker.onLocationChanged(this.location);
+        }else{
             startLocationUpdates();
-        } else {
-            requestPermissions();
         }
     }
 
+    @SuppressLint("MissingPermission")
+    public void getLastLocation()
+    {
+        mFusedLocationClient.getLastLocation().addOnSuccessListener(new OnSuccessListener<Location>()
+        {
+            @Override
+            public void onSuccess(Location location)
+            {
+                // GPS location can be null if GPS is switched off
+                if(location != null)
+                {
+                    tracker.onLocationChanged(location);
+                }
+                else
+                {
+                    LocationHelper.this.getLocation();
+                }
+            }
+        }).addOnFailureListener(new OnFailureListener()
+        {
+            @Override
+            public void onFailure(
+                    @NonNull
+                            Exception e)
+            {
+                e.printStackTrace();
+            }
+        });
+    }
+
     @Override
-    public void onLocationResult(LocationResult locationResult) {
+    public void onLocationResult(LocationResult locationResult)
+    {
         super.onLocationResult(locationResult);
-        if (tracker != null) {
-            tracker.onLocationChanged(locationResult.getLastLocation());
+        this.location = locationResult.getLastLocation();
+        LocationHolder.getInstance().setLocation(location);
+        locationInProgress = false;
+        if(tracker != null && this.location!=null)
+        {
+            tracker.onLocationChanged(this.location);
         }
         stopLocationUpdates();
     }
 
-
-    private boolean checkPermissions() {
+    public boolean checkPermissions()
+    {
 
         int permissionState = ActivityCompat.checkSelfPermission(activity.get(), Manifest.permission.ACCESS_COARSE_LOCATION);
         return permissionState == PackageManager.PERMISSION_GRANTED;
     }
 
-    public void stopLocationUpdates() {
+    public void stopLocationUpdates()
+    {
 
-        if (null != activity) {
+        if(null != activity)
+        {
             mFusedLocationClient.removeLocationUpdates(this);
         }
     }
 
+    public void setLocationInProgress(boolean locationInProgress) {
+        this.locationInProgress = locationInProgress;
+    }
 
-    private void startLocationUpdates() {
-        mSettingsClient.checkLocationSettings(mLocationSettingsRequest)
-                .addOnSuccessListener(activity.get(), new OnSuccessListener<LocationSettingsResponse>() {
-                    @Override
-                    public void onSuccess(LocationSettingsResponse locationSettingsResponse) {
-                        Log.i(TAG, "All location settings are satisfied.");
+    private void startLocationUpdates()
+    {
+        if(null != activity)
+        {
+            if(locationInProgress){
+                return;
+            }
+            locationInProgress = true;
 
-                        //noinspection MissingPermission
-                        mFusedLocationClient.requestLocationUpdates(mLocationRequest,
-                                LocationHelper.this, Looper.myLooper());
+            if(!isGPSEnabled())
+            {
+                activity.get().startActivityForResult(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS), 505);
+            }
+            else
+            {
+                if(ActivityCompat.checkSelfPermission(activity.get(),
+                                                      Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat
+                        .checkSelfPermission(activity.get(),
+                                             Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
+                {
+                    return;
+                }
+                mFusedLocationClient.requestLocationUpdates(mLocationRequest, LocationHelper.this, Looper.myLooper());
+                //getLastLocation();
+            }
+        }
+    }
 
+    public boolean isGPSEnabled(){
+        LocationManager lm = (LocationManager) activity.get().getSystemService(Context.LOCATION_SERVICE);
+        boolean gps_enabled = false;
+        //boolean network_enabled = false;
 
-                    }
-                })
-                .addOnFailureListener(activity.get(), new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        int statusCode = ((ApiException) e).getStatusCode();
-                        switch (statusCode) {
-                            case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
-                                Log.i(TAG, "Location settings are not satisfied.");
-                                try {
-                                    // Show the dialog by calling startResolutionForResult(), and check the
-                                    // result in onActivityResult().
-                                    ResolvableApiException rae = (ResolvableApiException) e;
-                                    rae.startResolutionForResult(activity.get(), REQUEST_CHECK_SETTINGS);
+        try
+        {
+            gps_enabled = lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        }
+        catch(Exception ex)
+        {
+        }
 
-                                } catch (IntentSender.SendIntentException sie) {
-                                    Log.i(TAG, "PendingIntent unable to execute request.");
-                                }
-                                break;
-                            case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
-                                String errorMessage = "Location settings are inadequate, and cannot be " +
-                                        "fixed here. Fix in Settings.";
-                                Log.e(TAG, errorMessage);
-                                break;
-                            default:
-                                Log.e(TAG, "Location Update Failed.");
-
-                        }
-
-                    }
-                });
+        return gps_enabled;
     }
 
 
-    private void requestPermissions() {
+    public void requestPermissions() {
 
         ActivityCompat.requestPermissions(activity.get(),
                                           new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION},

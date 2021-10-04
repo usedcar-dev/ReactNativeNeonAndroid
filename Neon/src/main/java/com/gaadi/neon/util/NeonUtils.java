@@ -1,21 +1,28 @@
 package com.gaadi.neon.util;
 
+import static android.content.ContentValues.TAG;
+
 import android.app.Activity;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.ContentResolver;
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.Path;
 import android.hardware.Camera;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.provider.OpenableColumns;
 import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.NotificationCompat;
@@ -36,7 +43,10 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.channels.FileChannel;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -442,32 +452,36 @@ public class NeonUtils {
         return bmOut;
     }
 
-    public static File getEmptyStoragePath(Context ctx) {
-        File mediaFile = null;
+    public static File getEmptyStoragePath(Context ctx)
+    {
+        //        File mediaFile = null;
+        //        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss.SSS").format(new Date());
+        //        String selectedPath = null;
+        //        ArrayList<String> list = (ArrayList) getSdCardPaths(ctx, true);
+        //        for (String path : list) {
+        //
+        //            long freeBytes = new File(path).getFreeSpace();
+        //            if (freeBytes > 5120) {
+        //                selectedPath = path;
+        //                break;
+        //            }
+        //        }
+        //        File externalDir = new File(selectedPath, ctx.getString(R.string.app_name));
+        //        if (!externalDir.exists()) {
+        //            if (!externalDir.mkdir()) {
+        //                //Toast.makeText(ctx,"FAILED externalDir.mkdir() TO CREATE DIRECTORY",Toast.LENGTH_SHORT).show();
+        //                Log.d("MyCameraApp", "failed to create directory");
+        //                return null;
+        //            } else {
+        //                //Toast.makeText(ctx,"SUCCESS to create folder",Toast.LENGTH_SHORT).show();
+        //            }
+        //        }
+        //
+        //        mediaFile = new File(externalDir.getPath() + File.separator +
+        //                "IMG_" + timeStamp + ".jpg");
+        ContextWrapper cw = new ContextWrapper(ctx);
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss.SSS").format(new Date());
-        String selectedPath = null;
-        ArrayList<String> list = (ArrayList) getSdCardPaths(ctx, true);
-        for (String path : list) {
-
-            long freeBytes = new File(path).getFreeSpace();
-            if (freeBytes > 5120) {
-                selectedPath = path;
-                break;
-            }
-        }
-        File externalDir = new File(selectedPath, ctx.getString(R.string.app_name));
-        if (!externalDir.exists()) {
-            if (!externalDir.mkdir()) {
-                //Toast.makeText(ctx,"FAILED externalDir.mkdir() TO CREATE DIRECTORY",Toast.LENGTH_SHORT).show();
-                Log.d("MyCameraApp", "failed to create directory");
-                return null;
-            } else {
-                //Toast.makeText(ctx,"SUCCESS to create folder",Toast.LENGTH_SHORT).show();
-            }
-        }
-
-        mediaFile = new File(externalDir.getPath() + File.separator +
-                "IMG_" + timeStamp + ".jpg");
+        File mediaFile = new File(cw.getExternalCacheDir() + File.separator + "IMG_" + timeStamp + ".jpg");
         return mediaFile;
     }
 
@@ -621,8 +635,8 @@ public class NeonUtils {
 
     }
 
-    public static void copyFile(String sourcePath, File destFile) {
-        File sourceFile = new File(sourcePath);
+    /*public static void copyFile(Context context,String sourcePath, File destFile) {
+        Log.d(TAG, "copyFile: "+context+" "+sourcePath+ " "+ destFile);
 
         if (!destFile.exists()) {
             try {
@@ -632,44 +646,65 @@ public class NeonUtils {
             }
         }
 
-        FileChannel source = null;
-        FileChannel destination = null;
-
+        FileOutputStream destinationOutputStream = null;
+        Bitmap bitmap = null;
         try {
-
-            /**
-             * getChannel() returns unique FileChannel object associated a file
-             * output stream.
-             */
-            source = new FileInputStream(sourceFile).getChannel();
-
-            destination = new FileOutputStream(destFile).getChannel();
-
-            if (destination != null && source != null) {
-                destination.transferFrom(source, 0, source.size());
-            }
+            ContentResolver contentResolver = context.getContentResolver();
+            bitmap = MediaStore.Images.Media.getBitmap(contentResolver,Uri.parse(sourcePath));
+            destinationOutputStream = new FileOutputStream(destFile);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, destinationOutputStream);
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
-            if (source != null) {
-                try {
-                    source.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+            if(bitmap!=null && !bitmap.isRecycled()){
+                bitmap.recycle();
             }
-            if (destination != null) {
+            if(destinationOutputStream != null ){
                 try {
-                    destination.close();
+                    destinationOutputStream.close();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
         }
+    }*/
+
+    public static void copyFile(Context context,String sourcePath, File destFile) {
+
+        InputStream in = null;
+        OutputStream out = null;
+        try {
+            in = new FileInputStream(sourcePath);
+            out = new FileOutputStream(destFile);
+
+            byte[] buffer = new byte[1024];
+            int read;
+            while ((read = in.read(buffer)) != -1) {
+                out.write(buffer, 0, read);
+            }
+            in.close();
+            in = null;
+
+            // write the output file (You have now copied the file)
+            out.flush();
+            out.close();
+            out = null;
+
+         //   LOGGER.debug("Copied file to " + outputPath);
+            Log.d(TAG, "copyFile: ");
+
+        } catch (FileNotFoundException fnfe1) {
+           // LOGGER.error(fnfe1.getMessage());
+            Log.d(TAG, "copyFile: 1"+fnfe1.getMessage());
+        } catch (Exception e) {
+            //LOGGER.error("tag", e.getMessage());
+            Log.d(TAG, "copyFile: 2"+e.getMessage());
+        }
     }
+
 
     public static File getImageOutputFile(Context context, String originalPath, String folderName, String imageName, int index) {
         if (imageName == null) {
@@ -679,7 +714,9 @@ public class NeonUtils {
         if (appName.length() > 0) {
             appName = appName.replace(" ", "");
         }
-        String path = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + appName + File.separator + folderName;
+
+        ContextWrapper cw = new ContextWrapper(context);
+        String path = cw.getExternalFilesDir(Environment.DIRECTORY_PICTURES) + File.separator + appName + File.separator + folderName;
 
         String pathForCheck = path + File.separator + imageName;
 
@@ -708,15 +745,80 @@ public class NeonUtils {
         String path;
         if (folderName != null) {
             path = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + appName + File.separator + folderName;
-        } else {
+        }
+        else
+        {
             path = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + appName;
         }
         File mediaStorageDir = new File(path);
         // Create a media file name
         //String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss.SSS").format(new Date());
-        return mediaStorageDir.getPath() + File.separator +
-                "IMG_" + System.currentTimeMillis() + ".jpg";
+        return mediaStorageDir.getPath() + File.separator + "IMG_" + System.currentTimeMillis() + ".jpg";
     }
 
+    public static String copyFileToInternalStorage(Context mContext, Uri uri, String newDirName)
+    {
+        Uri returnUri = uri;
 
+        Cursor returnCursor = mContext.getContentResolver()
+                .query(returnUri, new String[]{OpenableColumns.DISPLAY_NAME, OpenableColumns.SIZE}, null, null, null);
+        if(returnCursor == null)
+        {
+            return null;
+        }
+
+        try
+        {
+            if(returnCursor.moveToFirst())
+            {
+                int nameIndex = returnCursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
+                int sizeIndex = returnCursor.getColumnIndex(OpenableColumns.SIZE);
+                returnCursor.moveToFirst();
+                String name = (returnCursor.getString(nameIndex));
+                String size = (Long.toString(returnCursor.getLong(sizeIndex)));
+
+                File output;
+                if(!newDirName.equals(""))
+                {
+                    File dir = new File(mContext.getFilesDir() + "/" + newDirName);
+                    if(!dir.exists())
+                    {
+                        dir.mkdir();
+                    }
+                    output = new File(mContext.getFilesDir() + "/" + newDirName + "/" + name);
+                }
+                else
+                {
+                    output = new File(mContext.getFilesDir() + "/" + name);
+                }
+                try
+                {
+                    InputStream inputStream = mContext.getContentResolver().openInputStream(uri);
+                    FileOutputStream outputStream = new FileOutputStream(output);
+                    int read = 0;
+                    int bufferSize = 1024;
+                    final byte[] buffers = new byte[bufferSize];
+                    while((read = inputStream.read(buffers)) != -1)
+                    {
+                        outputStream.write(buffers, 0, read);
+                    }
+
+                    inputStream.close();
+                    outputStream.close();
+                }
+                catch(Exception e)
+                {
+
+                    Log.e("Exception", e.getMessage());
+                }
+
+                return output.getPath();
+            }
+        }
+        finally
+        {
+            returnCursor.close();
+        }
+        return null;
+    }
 }

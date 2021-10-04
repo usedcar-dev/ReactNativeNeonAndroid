@@ -1,15 +1,21 @@
 package com.gaadi.neon.util;
 
+import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.ContextWrapper;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Environment;
+import android.provider.MediaStore;
+import android.support.annotation.RequiresApi;
 import android.util.Log;
 
 import com.scanlibrary.R;
 
 import java.io.File;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.io.IOException;
+import java.io.OutputStream;
 
 /**
  * Created by Lakshay
@@ -46,9 +52,12 @@ public class Constants {
     public static final String CATEGORY = "category";
     public static final String SUB_CATEGORY = "subCategory";
     public static final String CAM_SCANNER_API_KEY = "camScannerApiKey";
-    public static File getMediaOutputFile(Context context, int type, String folderName) {
+
+    public static File getMediaOutputFileNew(Context context, int type, String folderName)
+    {
         String appName = context.getString(R.string.app_name);
-        if (appName.length() > 0) {
+        if(appName.length() > 0)
+        {
             appName = appName.replace(" ", "");
         }
 
@@ -56,7 +65,8 @@ public class Constants {
         File mediaStorageDir = new File(cw.getExternalFilesDir(Environment.DIRECTORY_PICTURES), appName);
 
         // Create the storage directory if it does not exist
-        if (!mediaStorageDir.exists()) {
+        if(!mediaStorageDir.exists())
+        {
             if (!mediaStorageDir.mkdirs()) {
                 Log.d("MyCameraApp", "failed to create directory");
             }
@@ -65,17 +75,94 @@ public class Constants {
         //String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss.SSS").format(new Date());
         File mediaFile;
 
-        if (type == TYPE_IMAGE) {
-            mediaFile = new File(mediaStorageDir,
-                    "IMG_" + System.currentTimeMillis() + ".jpg");
-        } else
+        if(type == TYPE_IMAGE)
+        {
+            mediaFile = new File(mediaStorageDir, "IMG_" + System.currentTimeMillis() + ".jpg");
+        }
+        else
+        {
             return null;
+        }
         return mediaFile;
     }
 
-    public static String getAppName(Context context){
+    public static File getMediaOutputFile(Context context, int type, String folderName)
+    {
         String appName = context.getString(R.string.app_name);
-        if (appName.length() > 0) {
+        if(appName.length() > 0)
+        {
+            appName = appName.replace(" ", "");
+        }
+        String path;
+        if(folderName != null)
+        {
+            path = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + appName + File.separator + folderName;
+        }
+        else
+        {
+            path = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + appName;
+        }
+
+        File mediaStorageDir = new File(path);
+
+        // Create the storage directory if it does not exist
+        if(!mediaStorageDir.exists())
+        {
+            if(!mediaStorageDir.mkdirs())
+            {
+                Log.d("MyCameraApp", "failed to create directory");
+            }
+        }
+        // Create a media file name
+        //String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss.SSS").format(new Date());
+        File mediaFile;
+
+        if(type == TYPE_IMAGE)
+        {
+            mediaFile = new File(mediaStorageDir.getPath() + File.separator + "IMG_" + System.currentTimeMillis() + ".jpg");
+        }
+        else
+        {
+            return null;
+        }
+        return mediaFile;
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.Q)
+    public static OutputStream getMediaOutputStream(Context context, int type, String folderName)
+    {
+        OutputStream fos = null;
+        File imageFile = null;
+        Uri imageUri = null;
+        try
+        {
+            ContentResolver resolver = context.getContentResolver();
+            ContentValues contentValues = new ContentValues();
+            contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, "IMG_" + System.currentTimeMillis());
+            contentValues.put(MediaStore.MediaColumns.MIME_TYPE, "image/png");
+            contentValues.put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_PICTURES + File.separator + folderName);
+            imageUri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues);
+
+            if(imageUri == null)
+            {
+                throw new IOException("Failed to create new MediaStore record.");
+            }
+
+            fos = resolver.openOutputStream(imageUri);
+            return fos;
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+        }
+        return fos;
+    }
+
+    public static String getAppName(Context context)
+    {
+        String appName = context.getString(R.string.app_name);
+        if(appName.length() > 0)
+        {
             appName = appName.replace(" ", "");
         }
         return appName;
