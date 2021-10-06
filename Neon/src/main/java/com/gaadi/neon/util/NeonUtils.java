@@ -17,6 +17,7 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Path;
 import android.hardware.Camera;
+import android.media.ExifInterface;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Build;
@@ -547,9 +548,11 @@ public class NeonUtils {
         return scaledBitmap;
     }
 
-    public static String compressImage(int compressionValue, String path, int DESIREDWIDTH, int DESIREDHEIGHT) {
+    public static String compressImage(int compressionValue, String path, int DESIREDWIDTH, int DESIREDHEIGHT) throws IOException {
         String strMyImagePath = null;
         Bitmap scaledBitmap;
+        ExifInterface oldExif = new ExifInterface(path);
+        String exifOrientation = oldExif.getAttribute(ExifInterface.TAG_ORIENTATION);
 
         try {
 // Part 1: Decode image
@@ -588,6 +591,12 @@ public class NeonUtils {
 
             scaledBitmap.recycle();
         } catch (Throwable ignored) {
+        }
+
+        if (exifOrientation != null) {
+            ExifInterface newExif = new ExifInterface(path);
+            newExif.setAttribute(ExifInterface.TAG_ORIENTATION, exifOrientation);
+            newExif.saveAttributes();
         }
 
         if (strMyImagePath == null) {
