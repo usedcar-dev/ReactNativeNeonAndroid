@@ -245,7 +245,7 @@ public class ImageReviewViewPagerFragment extends Fragment implements View.OnCli
             warnDeleteDialog(event);
         } else if (v.getId() == R.id.imagereview_rotatebtn)
         {
-            rotateImage(imageModel.getFilePath());
+            Toast.makeText(getActivity(), getActivity().getString(R.string.gallery_image_editing_error), Toast.LENGTH_SHORT).show();
         } else if (v.getId() == R.id.imagereview_tag_spinner) {
             showTagsDropDown(v);
         } else if (v.getId() == R.id.imagereview_cropbtn) {
