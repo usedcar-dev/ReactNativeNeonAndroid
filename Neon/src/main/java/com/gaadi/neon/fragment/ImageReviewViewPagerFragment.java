@@ -1,5 +1,7 @@
 package com.gaadi.neon.fragment;
 
+import static android.content.ContentValues.TAG;
+
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -324,7 +326,9 @@ public class ImageReviewViewPagerFragment extends Fragment implements View.OnCli
                 return null;
             }
 
+            exifReader.setAttribute(ExifInterface.TAG_ORIENTATION, "0");
 
+            matrix.postRotate(rotate);
             draweeView.setRotation(draweeView.getRotation() + 90.0f);
             ImageEditEvent event = new ImageEditEvent();
             event.setModel(imageModel);
@@ -332,7 +336,7 @@ public class ImageReviewViewPagerFragment extends Fragment implements View.OnCli
             ((FragmentListener) getActivity()).getFragmentChanges(event);
 
 
-            // matrix.postRotate(rotate);
+            //
             //Button btn_RotateImg = (Button) findViewById(R.id.btn_RotateImg);
            /* try {
                 b = loadBitmap(path, rotate, screenWidth, screenHeight);

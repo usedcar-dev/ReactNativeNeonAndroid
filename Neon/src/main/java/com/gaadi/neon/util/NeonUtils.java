@@ -15,6 +15,7 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Path;
 import android.hardware.Camera;
 import android.media.ExifInterface;
@@ -552,11 +553,30 @@ public class NeonUtils {
         String strMyImagePath = null;
         Bitmap scaledBitmap;
         ExifInterface oldExif = new ExifInterface(path);
-        String exifOrientation = oldExif.getAttribute(ExifInterface.TAG_ORIENTATION);
+        int exifOrientation = oldExif.getAttributeInt(ExifInterface.TAG_ORIENTATION, -1);
+
+        // Log.d(TAG, "compressImage: "+exifOrientation);
 
         try {
 // Part 1: Decode image
             Bitmap unscaledBitmap = ScalingUtilies.decodeFile(path, DESIREDWIDTH, DESIREDHEIGHT, ScalingUtilies.ScalingLogic.FIT);
+
+            Matrix matrix = new Matrix();
+
+            int rotate = 0;
+            if (exifOrientation == ExifInterface.ORIENTATION_NORMAL) {
+                // Do nothing. The original image is fine.
+            } else if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_90) {
+                rotate = -90;
+            } else if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_180) {
+                rotate = -180;
+            } else if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_270) {
+                rotate = -270;
+            }
+
+            matrix.postRotate(rotate);
+
+            unscaledBitmap = Bitmap.createBitmap(unscaledBitmap,0,0,unscaledBitmap.getHeight(),unscaledBitmap.getWidth(),matrix,true);
 
             if (!(unscaledBitmap.getWidth() <= DESIREDWIDTH && unscaledBitmap.getHeight() <= DESIREDHEIGHT)) {
 // Part 2: Scale image
@@ -576,6 +596,9 @@ public class NeonUtils {
 
             String s = "tmp.jpg";*/
 
+
+
+
             File f = new File(path);
 
             strMyImagePath = f.getAbsolutePath();
@@ -593,11 +616,12 @@ public class NeonUtils {
         } catch (Throwable ignored) {
         }
 
-        if (exifOrientation != null) {
-            ExifInterface newExif = new ExifInterface(path);
-            newExif.setAttribute(ExifInterface.TAG_ORIENTATION, exifOrientation);
-            newExif.saveAttributes();
-        }
+      //  if (exifOrientation != null) {
+
+           // ExifInterface newExif = new ExifInterface(path);
+           // newExif.setAttribute(ExifInterface.TAG_ORIENTATION, exifOrientation);
+           // newExif.saveAttributes();
+     //   }
 
         if (strMyImagePath == null) {
             return path;
