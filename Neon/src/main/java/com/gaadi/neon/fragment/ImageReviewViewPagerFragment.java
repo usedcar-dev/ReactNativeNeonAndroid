@@ -40,10 +40,12 @@ import com.gaadi.neon.util.Constants;
 import com.gaadi.neon.util.FileInfo;
 import com.gaadi.neon.util.NeonImagesHandler;
 import com.gaadi.neon.util.NeonUtils;
+import com.gaadi.neon.util.ScalingUtilies;
 import com.scanlibrary.R;
 import com.soundcloud.android.crop.Crop;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
 
@@ -325,10 +327,34 @@ public class ImageReviewViewPagerFragment extends Fragment implements View.OnCli
                 Log.e("ERROR", "Not Able to rotate image due to orientation tag=" + orientation);
                 return null;
             }
-
+            matrix.postRotate(rotate);
             exifReader.setAttribute(ExifInterface.TAG_ORIENTATION, "0");
 
-            matrix.postRotate(rotate);
+            try {
+// Part 1: Decode image
+                Bitmap bitmap = ScalingUtilies.decodeFile(path, 1024, 900, ScalingUtilies.ScalingLogic.FIT);
+                bitmap = Bitmap.createBitmap(bitmap,0,0,bitmap.getWidth(),bitmap.getHeight(),matrix,true);
+
+                File f = new File(path);
+
+             //   strMyImagePath = f.getAbsolutePath();
+                FileOutputStream fos;
+                try {
+                    fos = new FileOutputStream(f);
+                    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
+                    fos.flush();
+                    fos.close();
+                    Log.d(TAG, "getBitmap: saved");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                bitmap.recycle();
+
+            } catch (Throwable ignored) {
+            }
+
+
             draweeView.setRotation(draweeView.getRotation() + 90.0f);
             ImageEditEvent event = new ImageEditEvent();
             event.setModel(imageModel);

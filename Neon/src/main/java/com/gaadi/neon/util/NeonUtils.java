@@ -567,16 +567,17 @@ public class NeonUtils {
             if (exifOrientation == ExifInterface.ORIENTATION_NORMAL) {
                 // Do nothing. The original image is fine.
             } else if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_90) {
-                rotate = -90;
+                rotate = 90;
             } else if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_180) {
-                rotate = -180;
+                rotate = 180;
             } else if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_270) {
-                rotate = -270;
+                rotate = 270;
             }
 
             matrix.postRotate(rotate);
+          //  Log.d(TAG, "compressImage: 4"+Bitmap.createBitmap(unscaledBitmap,0,0,unscaledBitmap.getWidth(),unscaledBitmap.getHeight(),matrix,true));
 
-            unscaledBitmap = Bitmap.createBitmap(unscaledBitmap,0,0,unscaledBitmap.getHeight(),unscaledBitmap.getWidth(),matrix,true);
+            unscaledBitmap = Bitmap.createBitmap(unscaledBitmap,0,0,unscaledBitmap.getWidth(),unscaledBitmap.getHeight(),matrix,true);
 
             if (!(unscaledBitmap.getWidth() <= DESIREDWIDTH && unscaledBitmap.getHeight() <= DESIREDHEIGHT)) {
 // Part 2: Scale image
