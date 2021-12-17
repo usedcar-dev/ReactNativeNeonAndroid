@@ -353,7 +353,6 @@ public class NeonImagesHandler {
                                 if (setCompressBy != 0) {
                                    // NeonUtils.compressImage(setCompressBy, newFile.getAbsolutePath(), 1024, 900);
                                 }
-//                               // NeonUtils.compressImage(30, newFile.getAbsolutePath(), 1024, 900);
                                 NeonUtils.scanFile(activity, newFile.getAbsolutePath());
                                 FileInfo newFileInfo = fileInfos.get(i);
                                 newFileInfo.setFilePath(newFile.getAbsolutePath());
