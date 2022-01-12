@@ -237,7 +237,8 @@ public class NeonImagesHandler {
             if (getGenericParam().getNumberOfPhotos() > 0 &&
                     getImagesCollection() != null &&
                     getGenericParam().getNumberOfPhotos() == getImagesCollection().size()) {
-                Toast.makeText(context, context.getString(R.string.max_count_error, getGenericParam().getNumberOfPhotos()), Toast.LENGTH_SHORT).show();
+                imagesCollection.set(imagesCollection.size()-1,fileInfo);
+              //  Toast.makeText(context, context.getString(R.string.max_count_error, getGenericParam().getNumberOfPhotos()), Toast.LENGTH_SHORT).show();
                 return false;
             }
         } else {
