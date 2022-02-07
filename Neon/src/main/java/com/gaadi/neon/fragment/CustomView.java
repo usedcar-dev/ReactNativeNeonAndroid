@@ -163,9 +163,12 @@ public class CustomView extends View {
         if(initialized) {
             SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
             String path = preferences.getString("imgPath","");
+            Bitmap bitmap = BitmapFactory.decodeFile(path);
+            int centerX = (canvas.getWidth() - bitmap.getWidth())/2;
+            int centerY = (canvas.getHeight() - bitmap.getHeight())/2;
             try {
                 Log.d(TAG, "onDraw: "+path);
-                canvas.drawBitmap(BitmapFactory.decodeFile(path), 0, 0, null);
+                canvas.drawBitmap(BitmapFactory.decodeFile(path), centerX, centerY, null);
 
             }catch (Exception e){
                 Log.d(TAG, "onDraw: "+e);
@@ -178,11 +181,10 @@ public class CustomView extends View {
 
             //crop rectangle
             SharedPreferences.Editor editor = preferences.edit();
-            editor.putInt("pointX",points[0].x);
-            editor.putInt("pointY",points[0].y);
+            editor.putInt("pointX",points[0].x-centerX);
+            editor.putInt("pointY",points[0].y-centerY);
             editor.putInt("halfCorner",halfCorner);
             editor.putInt("side",side);
-            editor.putString("Name","Harneet");
             editor.apply();
             canvas.drawRect(points[0].x + halfCorner,points[0].y + halfCorner, points[0].x + halfCorner + side, points[0].y + halfCorner + side, paint);
 

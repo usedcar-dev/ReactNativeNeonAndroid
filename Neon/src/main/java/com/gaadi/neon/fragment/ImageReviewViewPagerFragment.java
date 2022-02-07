@@ -39,9 +39,11 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
+import com.gaadi.neon.activity.gallery.GridFoldersActivity;
 import com.gaadi.neon.adapter.ImageTagsAdapter;
 import com.gaadi.neon.events.ImageEditEvent;
 import com.gaadi.neon.interfaces.FragmentListener;
+import com.gaadi.neon.interfaces.ICameraParam;
 import com.gaadi.neon.model.ImageTagModel;
 import com.gaadi.neon.util.Constants;
 import com.gaadi.neon.util.FileInfo;
@@ -71,6 +73,7 @@ public class ImageReviewViewPagerFragment extends Fragment implements View.OnCli
     /**
      * The fragment's page number, which is set to the argument value for {@link #ARG_PAGE}.
      */
+    ICameraParam cameraParam;
     private int mPageNumber;
     private int xCoords = 20;
     private int yCoords = 20;
@@ -88,6 +91,7 @@ public class ImageReviewViewPagerFragment extends Fragment implements View.OnCli
     private RelativeLayout fileEditLayout;
     private CustomView highlighter;
     private boolean highlightShow = false;
+    private boolean isDamageImage;
 
     public ImageReviewViewPagerFragment() {
     }
@@ -140,6 +144,9 @@ public class ImageReviewViewPagerFragment extends Fragment implements View.OnCli
                 .inflate(R.layout.fragment_image_review_viewpager, container, false);
 
         fileEditLayout = (RelativeLayout) rootView.findViewById(R.id.header_options_imageereview);
+        cameraParam = NeonImagesHandler.getSingletonInstance().getCameraParam();
+        isDamageImage = cameraParam.getCustomParameters().isDamageImage();
+        Log.d(TAG, "onCreateView: "+cameraParam.getCustomParameters().isDamageImage());
 
 
 
@@ -288,25 +295,27 @@ public class ImageReviewViewPagerFragment extends Fragment implements View.OnCli
                 e.printStackTrace();
             }
         }else if(v.getId() == R.id.imagereview_highlightbtn){
-            if(highlightShow){
-                highlightShow = false;
-                highlighter.setVisibility(View.GONE);
-                draweeView.setVisibility(View.VISIBLE);
-                SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
-                String name = preferences.getString("Name", "");
-                int side = preferences.getInt("side",0);
-                int pointX = preferences.getInt("pointX",0);
-                int pointY = preferences.getInt("pointY",0);
-                int halfCorner = preferences.getInt("halfCorner",0);
-                Log.d(TAG, "onClick: "+side);
-                drawHighlighter(imageModel.getFilePath(),pointX,pointY,side,halfCorner);
-
+            if(!isDamageImage){
+                Toast.makeText(getContext(), "Not allowed for this image", Toast.LENGTH_SHORT).show();
             }else {
-                highlightShow = true;
-                highlighter.setVisibility(View.VISIBLE);
-                draweeView.setVisibility(View.GONE);
-            }
+                if (highlightShow) {
+                    highlightShow = false;
+                    highlighter.setVisibility(View.GONE);
+                    draweeView.setVisibility(View.VISIBLE);
+                    SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+                    int side = preferences.getInt("side", 0);
+                    int pointX = preferences.getInt("pointX", 0);
+                    int pointY = preferences.getInt("pointY", 0);
+                    int halfCorner = preferences.getInt("halfCorner", 0);
+                    Log.d(TAG, "onClick: " + side);
+                    drawHighlighter(imageModel.getFilePath(), pointX, pointY, side, halfCorner);
 
+                } else {
+                    highlightShow = true;
+                    highlighter.setVisibility(View.VISIBLE);
+                    draweeView.setVisibility(View.GONE);
+                }
+            }
         }
     }
 
@@ -352,6 +361,7 @@ public class ImageReviewViewPagerFragment extends Fragment implements View.OnCli
         Paint paint=new Paint();
         paint.setColor(Color.RED);
         paint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeWidth(2);
 
         //cnvs.drawBitmap(BitmapFactory.decodeFile(path), 0, 0, null);
         cnvs.drawRect(pointX+halfCorner, pointY+halfCorner,pointX+halfCorner+side,pointY+halfCorner+side , paint);
@@ -427,7 +437,7 @@ public class ImageReviewViewPagerFragment extends Fragment implements View.OnCli
             }
 
 
-            //draweeView.setRotation(draweeView.getRotation() + 90.0f);
+            draweeView.setRotation(draweeView.getRotation() + 90.0f);
             ImageEditEvent event = new ImageEditEvent();
             event.setModel(imageModel);
             event.setImageEventType(ImageEditEvent.EVENT_ROTATE);

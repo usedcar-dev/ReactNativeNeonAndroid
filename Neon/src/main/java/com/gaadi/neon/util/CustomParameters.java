@@ -21,6 +21,7 @@ public class CustomParameters {
     private boolean showPreviewForEachImage;
     private Double latitudeInspectionForm;
     private Double longitudeInspectionForm;
+    private boolean isDamageImage = true;
 
     public Double getLatitudeInspectionForm()
     {
@@ -102,6 +103,8 @@ public class CustomParameters {
         return showPreviewForEachImage;
     }
 
+    public boolean isDamageImage(){ return isDamageImage;}
+
 
     public static class CustomParametersBuilder {
 
@@ -119,6 +122,7 @@ public class CustomParameters {
         private boolean showPreviewForEachImage;
         private Double latitudeInspectionForm;
         private Double longitudeInspectionForm;
+        private boolean isDamageImage;
 
         public CustomParametersBuilder sethideCameraButtonInNeutral(boolean hide)
         {
@@ -181,6 +185,11 @@ public class CustomParameters {
         public CustomParametersBuilder setShowPreviewForEachImage(boolean showPreviewForEachImage)
         {
             this.showPreviewForEachImage = showPreviewForEachImage;
+            return this;
+        }
+
+        public CustomParametersBuilder setIsDamageImage(boolean isDamageImage){
+            this.isDamageImage = isDamageImage;
             return this;
         }
 

@@ -20,25 +20,26 @@
             android:clickable="true"
             android:padding="5dp"
             android:src="@drawable/delete" />
-
-        <ImageView
-            android:id="@+id/imagereview_cropbtn"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_centerHorizontal="true"
-            android:clickable="true"
-            android:padding="5dp"
-            android:src="@drawable/crop" />
-
         <ImageView
             android:id="@+id/imagereview_highlightbtn"
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:layout_centerHorizontal="false"
-            android:layout_marginLeft="40dp"
+            android:layout_marginLeft="100dp"
             android:clickable="true"
             android:padding="5dp"
             android:src="@drawable/crop" />
+
+        <ImageView
+            android:id="@+id/imagereview_cropbtn"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_centerHorizontal="false"
+            android:clickable="true"
+            android:padding="5dp"
+            android:layout_marginLeft="220dp"
+            android:src="@drawable/crop" />
+
 
         <ImageView
             android:id="@+id/imagereview_rotatebtn"
@@ -79,8 +80,8 @@
 
     <com.gaadi.neon.fragment.CustomView
         android:id="@+id/highlighter"
-        android:layout_width="1024dp"
-        android:layout_height="900dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:background="@color/transparent"
         app:cornerColor="@color/black"
         app:cornerSize="20dp"
@@ -92,6 +93,9 @@
         app:resizeCornerDrawable="@drawable/check"
         android:layout_above="@+id/footer_layout_imagereview_fragment"
         android:layout_below="@+id/header_options_imageereview"
+        android:layout_centerInParent="true"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
         />
 
     <LinearLayout
