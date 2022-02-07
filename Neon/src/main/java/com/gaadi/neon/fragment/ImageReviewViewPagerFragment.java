@@ -146,9 +146,6 @@ public class ImageReviewViewPagerFragment extends Fragment implements View.OnCli
         fileEditLayout = (RelativeLayout) rootView.findViewById(R.id.header_options_imageereview);
         cameraParam = NeonImagesHandler.getSingletonInstance().getCameraParam();
         isDamageImage = cameraParam.getCustomParameters().isDamageImage();
-        Log.d(TAG, "onCreateView: "+cameraParam.getCustomParameters().isDamageImage());
-
-
 
         deleteBtn = (ImageView) rootView.findViewById(R.id.imagereview_deletebtn);
         cropBtn = (ImageView) rootView.findViewById(R.id.imagereview_cropbtn);
@@ -194,6 +191,7 @@ public class ImageReviewViewPagerFragment extends Fragment implements View.OnCli
     public void onLoad(Bundle savedInstanceState) {
         Bundle bundle = getArguments();
         imageModel = (FileInfo) bundle.getSerializable(Constants.IMAGE_MODEL_FOR__REVIEW);
+        Log.d(TAG, "onLoad: "+imageModel);
         if (savedInstanceState != null) {
             Object o = bundle.getSerializable(Constants.IMAGE_MODEL_FOR__REVIEW);
             if (o != null) {
@@ -217,10 +215,11 @@ public class ImageReviewViewPagerFragment extends Fragment implements View.OnCli
                 .diskCacheStrategy(DiskCacheStrategy.NONE)
                 .skipMemoryCache(true)
                 .into(draweeView);*/
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+        Log.d(TAG, "onLoad: 2"+imageModel);
+        /*SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
         SharedPreferences.Editor editor = preferences.edit();
         editor.putString("imgPath",imageModel.getFilePath());
-        editor.apply();
+        editor.apply();*/
     }
 
     @Override
@@ -295,6 +294,10 @@ public class ImageReviewViewPagerFragment extends Fragment implements View.OnCli
                 e.printStackTrace();
             }
         }else if(v.getId() == R.id.imagereview_highlightbtn){
+            SharedPreferences preference = PreferenceManager.getDefaultSharedPreferences(getContext());
+            SharedPreferences.Editor editor = preference.edit();
+            editor.putString("imgPath",imageModel.getFilePath());
+            editor.apply();
             if(!isDamageImage){
                 Toast.makeText(getContext(), "Not allowed for this image", Toast.LENGTH_SHORT).show();
             }else {
