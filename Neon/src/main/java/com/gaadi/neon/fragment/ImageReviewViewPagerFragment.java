@@ -8,12 +8,19 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Matrix;
+import android.graphics.Paint;
 import android.media.ExifInterface;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.support.annotation.RequiresApi;
 import android.support.v4.app.Fragment;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -65,8 +72,11 @@ public class ImageReviewViewPagerFragment extends Fragment implements View.OnCli
      * The fragment's page number, which is set to the argument value for {@link #ARG_PAGE}.
      */
     private int mPageNumber;
+    private int xCoords = 20;
+    private int yCoords = 20;
     private ImageView deleteBtn;
     private ImageView rotateBtn;
+    private ImageView highlightBtn;
     private TextView txtVwTagSpinner;
     private ImageView draweeView;
     private LinearLayout tagLayout;
@@ -76,6 +86,8 @@ public class ImageReviewViewPagerFragment extends Fragment implements View.OnCli
     private ImageView cropBtn;
     private File cropFilePath;
     private RelativeLayout fileEditLayout;
+    private CustomView highlighter;
+    private boolean highlightShow = false;
 
     public ImageReviewViewPagerFragment() {
     }
@@ -137,6 +149,12 @@ public class ImageReviewViewPagerFragment extends Fragment implements View.OnCli
         txtVwTagSpinner = (TextView) rootView.findViewById(R.id.imagereview_tag_spinner);
         draweeView = (ImageView) rootView.findViewById(R.id.imagereview_imageview);
         tagLayout = (LinearLayout) rootView.findViewById(R.id.footer_layout_imagereview_fragment);
+        highlightBtn = (ImageView) rootView.findViewById(R.id.imagereview_highlightbtn);
+        highlighter = (CustomView) rootView.findViewById(R.id.highlighter);
+
+        highlighter.setVisibility(View.GONE);
+
+
 
         if (NeonImagesHandler.getSingleonInstance().getGenericParam() != null &&
                 NeonImagesHandler.getSingleonInstance().getGenericParam().getTagEnabled()) {
@@ -149,6 +167,7 @@ public class ImageReviewViewPagerFragment extends Fragment implements View.OnCli
         rotateBtn.setOnClickListener(this);
         cropBtn.setOnClickListener(this);
         txtVwTagSpinner.setOnClickListener(this);
+        highlightBtn.setOnClickListener(this);
         onLoad(savedInstanceState);
         if (imageModel != null && imageModel.getFilePath() != null && (imageModel.getFilePath().contains("http") ||
                 imageModel.getFilePath().contains("https"))) {
@@ -191,6 +210,10 @@ public class ImageReviewViewPagerFragment extends Fragment implements View.OnCli
                 .diskCacheStrategy(DiskCacheStrategy.NONE)
                 .skipMemoryCache(true)
                 .into(draweeView);*/
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString("imgPath",imageModel.getFilePath());
+        editor.apply();
     }
 
     @Override
@@ -264,6 +287,26 @@ public class ImageReviewViewPagerFragment extends Fragment implements View.OnCli
             {
                 e.printStackTrace();
             }
+        }else if(v.getId() == R.id.imagereview_highlightbtn){
+            if(highlightShow){
+                highlightShow = false;
+                highlighter.setVisibility(View.GONE);
+                draweeView.setVisibility(View.VISIBLE);
+                SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+                String name = preferences.getString("Name", "");
+                int side = preferences.getInt("side",0);
+                int pointX = preferences.getInt("pointX",0);
+                int pointY = preferences.getInt("pointY",0);
+                int halfCorner = preferences.getInt("halfCorner",0);
+                Log.d(TAG, "onClick: "+side);
+                drawHighlighter(imageModel.getFilePath(),pointX,pointY,side,halfCorner);
+
+            }else {
+                highlightShow = true;
+                highlighter.setVisibility(View.VISIBLE);
+                draweeView.setVisibility(View.GONE);
+            }
+
         }
     }
 
@@ -294,6 +337,35 @@ public class ImageReviewViewPagerFragment extends Fragment implements View.OnCli
         AlertDialog dialog = builder.create();
         if (dialog != null && !dialog.isShowing()) {
             dialog.show();
+        }
+    }
+
+    private void drawHighlighter(String path,int pointX,int pointY,int side,int halfCorner){
+        Bitmap bitmap = BitmapFactory.decodeFile(path);
+        bitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true);
+            Canvas cnvs=new Canvas(bitmap);
+        Log.d(TAG, "drawHighlighter: "+path);
+
+
+        //img.setImageBitmap(bmp);
+
+        Paint paint=new Paint();
+        paint.setColor(Color.RED);
+        paint.setStyle(Paint.Style.STROKE);
+
+        //cnvs.drawBitmap(BitmapFactory.decodeFile(path), 0, 0, null);
+        cnvs.drawRect(pointX+halfCorner, pointY+halfCorner,pointX+halfCorner+side,pointY+halfCorner+side , paint);
+        draweeView.setImageBitmap(bitmap);
+        File f = new File(path);
+        FileOutputStream fos;
+        try {
+            fos = new FileOutputStream(f);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
+            fos.flush();
+            fos.close();
+            Log.d(TAG, "getBitmap: saved");
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -349,13 +421,13 @@ public class ImageReviewViewPagerFragment extends Fragment implements View.OnCli
                     e.printStackTrace();
                 }
 
-                bitmap.recycle();
+               // bitmap.recycle();
 
             } catch (Throwable ignored) {
             }
 
 
-            draweeView.setRotation(draweeView.getRotation() + 90.0f);
+            //draweeView.setRotation(draweeView.getRotation() + 90.0f);
             ImageEditEvent event = new ImageEditEvent();
             event.setModel(imageModel);
             event.setImageEventType(ImageEditEvent.EVENT_ROTATE);

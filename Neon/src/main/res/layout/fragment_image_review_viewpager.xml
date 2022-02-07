@@ -1,6 +1,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
 
     <RelativeLayout
@@ -8,7 +9,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/white"
-        android:orientation="horizontal"
         android:paddingLeft="10dp"
         android:paddingRight="10dp">
 
@@ -26,6 +26,16 @@
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:layout_centerHorizontal="true"
+            android:clickable="true"
+            android:padding="5dp"
+            android:src="@drawable/crop" />
+
+        <ImageView
+            android:id="@+id/imagereview_highlightbtn"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_centerHorizontal="false"
+            android:layout_marginLeft="40dp"
             android:clickable="true"
             android:padding="5dp"
             android:src="@drawable/crop" />
@@ -56,12 +66,33 @@
 
     <ImageView
         android:id="@+id/imagereview_imageview"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_width="1024dp"
+        android:layout_height="900dp"
         android:layout_above="@+id/footer_layout_imagereview_fragment"
         android:layout_below="@+id/header_options_imageereview"
         android:layout_marginLeft="15dp"
-        android:layout_marginRight="15dp" />
+        android:layout_marginRight="15dp"
+        >
+
+
+    </ImageView>
+
+    <com.gaadi.neon.fragment.CustomView
+        android:id="@+id/highlighter"
+        android:layout_width="1024dp"
+        android:layout_height="900dp"
+        android:background="@color/transparent"
+        app:cornerColor="@color/black"
+        app:cornerSize="20dp"
+        app:edgeColor="@color/red"
+        app:minimumSide="60dp"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
+        app:moveCornerDrawable="@drawable/cancel"
+        app:resizeCornerDrawable="@drawable/check"
+        android:layout_above="@+id/footer_layout_imagereview_fragment"
+        android:layout_below="@+id/header_options_imageereview"
+        />
 
     <LinearLayout
         android:id="@+id/footer_layout_imagereview_fragment"
