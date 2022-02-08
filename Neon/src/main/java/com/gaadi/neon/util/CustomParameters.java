@@ -21,7 +21,7 @@ public class CustomParameters {
     private boolean showPreviewForEachImage;
     private Double latitudeInspectionForm;
     private Double longitudeInspectionForm;
-    private boolean isDamageImage = true;
+    private boolean isDamageImage = false;
 
     public Double getLatitudeInspectionForm()
     {
@@ -188,8 +188,8 @@ public class CustomParameters {
             return this;
         }
 
-        public CustomParametersBuilder setIsDamageImage(boolean isDamageImage){
-            this.isDamageImage = isDamageImage;
+        public CustomParametersBuilder setIsDamageImage(boolean isDamageImag){
+            this.isDamageImage = isDamageImag;
             return this;
         }
 

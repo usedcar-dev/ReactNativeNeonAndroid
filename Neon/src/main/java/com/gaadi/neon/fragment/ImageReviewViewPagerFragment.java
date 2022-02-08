@@ -44,6 +44,7 @@ import com.gaadi.neon.adapter.ImageTagsAdapter;
 import com.gaadi.neon.events.ImageEditEvent;
 import com.gaadi.neon.interfaces.FragmentListener;
 import com.gaadi.neon.interfaces.ICameraParam;
+import com.gaadi.neon.interfaces.INeutralParam;
 import com.gaadi.neon.model.ImageTagModel;
 import com.gaadi.neon.util.Constants;
 import com.gaadi.neon.util.FileInfo;
@@ -73,7 +74,7 @@ public class ImageReviewViewPagerFragment extends Fragment implements View.OnCli
     /**
      * The fragment's page number, which is set to the argument value for {@link #ARG_PAGE}.
      */
-    ICameraParam cameraParam;
+    INeutralParam neutralParam;
     private int mPageNumber;
     private int xCoords = 20;
     private int yCoords = 20;
@@ -91,7 +92,7 @@ public class ImageReviewViewPagerFragment extends Fragment implements View.OnCli
     private RelativeLayout fileEditLayout;
     private CustomView highlighter;
     private boolean highlightShow = false;
-    private String titleName;
+    private boolean isDamageImage;
 
     public ImageReviewViewPagerFragment() {
     }
@@ -144,9 +145,9 @@ public class ImageReviewViewPagerFragment extends Fragment implements View.OnCli
                 .inflate(R.layout.fragment_image_review_viewpager, container, false);
 
         fileEditLayout = (RelativeLayout) rootView.findViewById(R.id.header_options_imageereview);
-       if(NeonImagesHandler.getSingletonInstance().getCameraParam()!=null&&NeonImagesHandler.getSingletonInstance().getNeutralParam().getCustomParameters().getTitleName()!=null){
-           cameraParam = NeonImagesHandler.getSingletonInstance().getNeutralParam();
-           titleName = cameraParam.getCustomParameters().getTitleName();
+       if(NeonImagesHandler.getSingletonInstance().getNeutralParam()!=null&&NeonImagesHandler.getSingletonInstance().getNeutralParam().getCustomParameters()!=null){
+           neutralParam = NeonImagesHandler.getSingletonInstance().getNeutralParam();
+           isDamageImage = neutralParam.getCustomParameters().isDamageImage();
        }
 
         deleteBtn = (ImageView) rootView.findViewById(R.id.imagereview_deletebtn);
@@ -298,7 +299,7 @@ public class ImageReviewViewPagerFragment extends Fragment implements View.OnCli
             SharedPreferences.Editor editor = preference.edit();
             editor.putString("imgPath",imageModel.getFilePath());
             editor.apply();
-            if(titleName!="Damages Images"){
+            if(!isDamageImage){
                 Toast.makeText(getContext(), "Not allowed for this image", Toast.LENGTH_SHORT).show();
             }else {
                 if (highlightShow) {
