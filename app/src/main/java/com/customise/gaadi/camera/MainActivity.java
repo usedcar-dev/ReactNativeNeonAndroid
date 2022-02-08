@@ -336,6 +336,7 @@ public class MainActivity extends AppCompatActivity implements OnImageCollection
                 public CustomParameters getCustomParameters() {
                     return new CustomParameters.CustomParametersBuilder()
                             .sethideCameraButtonInNeutral(false)
+                            .setIsDamageImage(true)
                             .setLocationRestrictive(true).build();
                 }
             }), this);

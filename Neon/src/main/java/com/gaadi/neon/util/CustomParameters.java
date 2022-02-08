@@ -1,5 +1,9 @@
 package com.gaadi.neon.util;
 
+import static android.content.ContentValues.TAG;
+
+import android.util.Log;
+
 /**
  * @author princebatra
  * @version 1.0
@@ -104,7 +108,9 @@ public class CustomParameters {
         return showPreviewForEachImage;
     }
 
-    public boolean isDamageImage(){ return isDamageImage;}
+    public boolean isDamageImage(){
+        Log.d(TAG, "isDamageImageGet: "+isDamageImage);
+        return isDamageImage;}
 
 
     public static class CustomParametersBuilder {
@@ -190,6 +196,7 @@ public class CustomParameters {
         }
 
         public CustomParametersBuilder setIsDamageImage(boolean isDamageImag){
+            Log.d(TAG, "setIsDamageImage: "+isDamageImag);
             this.isDamageImage = isDamageImag;
             return this;
         }
