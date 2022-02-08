@@ -144,8 +144,10 @@ public class ImageReviewViewPagerFragment extends Fragment implements View.OnCli
                 .inflate(R.layout.fragment_image_review_viewpager, container, false);
 
         fileEditLayout = (RelativeLayout) rootView.findViewById(R.id.header_options_imageereview);
-        cameraParam = NeonImagesHandler.getSingletonInstance().getCameraParam();
-        titleName = cameraParam.getCustomParameters().getTitleName();
+       if(NeonImagesHandler.getSingletonInstance().getCameraParam()!=null&&NeonImagesHandler.getSingletonInstance().getNeutralParam().getCustomParameters().getTitleName()!=null){
+           cameraParam = NeonImagesHandler.getSingletonInstance().getNeutralParam();
+           titleName = cameraParam.getCustomParameters().getTitleName();
+       }
 
         deleteBtn = (ImageView) rootView.findViewById(R.id.imagereview_deletebtn);
         cropBtn = (ImageView) rootView.findViewById(R.id.imagereview_cropbtn);
@@ -191,7 +193,6 @@ public class ImageReviewViewPagerFragment extends Fragment implements View.OnCli
     public void onLoad(Bundle savedInstanceState) {
         Bundle bundle = getArguments();
         imageModel = (FileInfo) bundle.getSerializable(Constants.IMAGE_MODEL_FOR__REVIEW);
-        Log.d(TAG, "onLoad: "+imageModel);
         if (savedInstanceState != null) {
             Object o = bundle.getSerializable(Constants.IMAGE_MODEL_FOR__REVIEW);
             if (o != null) {
@@ -215,7 +216,6 @@ public class ImageReviewViewPagerFragment extends Fragment implements View.OnCli
                 .diskCacheStrategy(DiskCacheStrategy.NONE)
                 .skipMemoryCache(true)
                 .into(draweeView);*/
-        Log.d(TAG, "onLoad: 2"+imageModel);
         /*SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
         SharedPreferences.Editor editor = preferences.edit();
         editor.putString("imgPath",imageModel.getFilePath());
