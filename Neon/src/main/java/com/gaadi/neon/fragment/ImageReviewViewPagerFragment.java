@@ -91,7 +91,7 @@ public class ImageReviewViewPagerFragment extends Fragment implements View.OnCli
     private RelativeLayout fileEditLayout;
     private CustomView highlighter;
     private boolean highlightShow = false;
-    private boolean isDamageImage;
+    private String titleName;
 
     public ImageReviewViewPagerFragment() {
     }
@@ -145,7 +145,7 @@ public class ImageReviewViewPagerFragment extends Fragment implements View.OnCli
 
         fileEditLayout = (RelativeLayout) rootView.findViewById(R.id.header_options_imageereview);
         cameraParam = NeonImagesHandler.getSingletonInstance().getCameraParam();
-        isDamageImage = cameraParam.getCustomParameters().isDamageImage();
+        titleName = cameraParam.getCustomParameters().getTitleName();
 
         deleteBtn = (ImageView) rootView.findViewById(R.id.imagereview_deletebtn);
         cropBtn = (ImageView) rootView.findViewById(R.id.imagereview_cropbtn);
@@ -298,7 +298,7 @@ public class ImageReviewViewPagerFragment extends Fragment implements View.OnCli
             SharedPreferences.Editor editor = preference.edit();
             editor.putString("imgPath",imageModel.getFilePath());
             editor.apply();
-            if(!isDamageImage){
+            if(titleName!="Damages Images"){
                 Toast.makeText(getContext(), "Not allowed for this image", Toast.LENGTH_SHORT).show();
             }else {
                 if (highlightShow) {
