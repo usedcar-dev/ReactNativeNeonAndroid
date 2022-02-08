@@ -195,9 +195,9 @@ public class CustomParameters {
             return this;
         }
 
-        public CustomParametersBuilder setIsDamageImage(boolean isDamageImag){
-            Log.d(TAG, "setIsDamageImage: "+isDamageImag);
-            this.isDamageImage = isDamageImag;
+        public CustomParametersBuilder setIsDamageImage(boolean isDamageImage){
+            Log.d(TAG, "setIsDamageImage: "+isDamageImage);
+            this.isDamageImage = isDamageImage;
             return this;
         }
 
