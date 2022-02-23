@@ -28,7 +28,7 @@
             android:layout_marginLeft="100dp"
             android:clickable="true"
             android:padding="5dp"
-            android:src="@drawable/crop" />
+            android:src="@drawable/marker" />
 
         <ImageView
             android:id="@+id/imagereview_cropbtn"
@@ -89,8 +89,8 @@
         app:minimumSide="60dp"
         android:layout_marginLeft="15dp"
         android:layout_marginRight="15dp"
-        app:moveCornerDrawable="@drawable/cancel"
-        app:resizeCornerDrawable="@drawable/check"
+        app:moveCornerDrawable="@drawable/drag"
+        app:resizeCornerDrawable="@drawable/resize"
         android:layout_above="@+id/footer_layout_imagereview_fragment"
         android:layout_below="@+id/header_options_imageereview"
         android:layout_centerInParent="true"
