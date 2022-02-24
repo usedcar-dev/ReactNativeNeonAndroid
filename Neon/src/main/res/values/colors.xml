@@ -37,4 +37,6 @@
     <color name="colorAccent">#FF4081</color>
     <color name="dark_gray">#363434</color>
     <color name="grey_light">#ffd3d3d3</color>
+
+    <color name="fluorescent">#CCFF00</color>
 </resources>

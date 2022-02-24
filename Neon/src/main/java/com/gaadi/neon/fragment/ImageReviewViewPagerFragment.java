@@ -22,6 +22,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -363,9 +364,10 @@ public class ImageReviewViewPagerFragment extends Fragment implements View.OnCli
         //img.setImageBitmap(bmp);
 
         Paint paint=new Paint();
-        paint.setColor(Color.RED);
+        int color = ContextCompat.getColor(getContext(),R.color.fluorescent);
+        paint.setColor(color);
         paint.setStyle(Paint.Style.STROKE);
-        paint.setStrokeWidth(2);
+        paint.setStrokeWidth(4);
 
         //cnvs.drawBitmap(BitmapFactory.decodeFile(path), 0, 0, null);
         cnvs.drawRect(pointX+halfCorner, pointY+halfCorner,pointX+halfCorner+side,pointY+halfCorner+side , paint);

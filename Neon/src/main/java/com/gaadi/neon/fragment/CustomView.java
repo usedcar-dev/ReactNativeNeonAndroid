@@ -143,10 +143,10 @@ public class CustomView extends View {
         resizeDrawable3 = ta.getDrawable(R.styleable.IconCropView_resizeCornerDrawable);
 
         //set drawable colors
-        moveDrawable.setTint(cornerColor);
-        resizeDrawable1.setTint(cornerColor);
-        resizeDrawable2.setTint(cornerColor);
-        resizeDrawable3.setTint(cornerColor);
+       // moveDrawable.setTint(cornerColor);
+       // resizeDrawable1.setTint(cornerColor);
+       // resizeDrawable2.setTint(cornerColor);
+       // resizeDrawable3.setTint(cornerColor);
         //recycle attributes
         ta.recycle();
 
