@@ -7,6 +7,6 @@
         <attr name="cornerColor" format="color"/>
         <attr name="edgeColor" format="color" />
         <attr name="outsideCropColor" format="color" />
-        <attr name="cornerSize" format="dimension" />
+        <attr name="cornerSize2" format="dimension" />
     </declare-styleable>
 </resources>

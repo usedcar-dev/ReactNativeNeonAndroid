@@ -104,7 +104,7 @@ public class CustomView extends View {
         //initial dimensions
         minimumSideLength = ta.getDimensionPixelSize(R.styleable.IconCropView_minimumSide, 20);
         side = minimumSideLength;
-        halfCorner = (ta.getDimensionPixelSize(R.styleable.IconCropView_cornerSize, 20))/2;
+        halfCorner = (ta.getDimensionPixelSize(R.styleable.IconCropView_cornerSize2, 20))/2;
 
         //colors
         cornerColor = ta.getColor(R.styleable.IconCropView_cornerColor, Color.BLACK);
