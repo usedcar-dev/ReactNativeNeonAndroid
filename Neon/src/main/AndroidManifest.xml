@@ -90,17 +90,7 @@
             android:launchMode="singleTask"
             android:screenOrientation="portrait" />
         <!-- Nougat specific -->
-        <provider
-            tools:replace="android:authorities"
-            android:name="android.support.v4.content.FileProvider"
-            android:authorities="@string/neon_file_provider_authority"
-            android:exported="false"
-            android:grantUriPermissions="true">
-            <meta-data
-                tools:replace="android:resource"
-                android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/provider_paths" />
-        </provider>
+
 
     </application>
 
