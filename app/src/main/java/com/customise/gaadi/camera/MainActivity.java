@@ -3,11 +3,12 @@ package com.customise.gaadi.camera;
 import android.location.Location;
 import android.media.ExifInterface;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.customise.gaadi.camera.util.CommonUtil;
 import com.gaadi.neon.PhotosLibrary;

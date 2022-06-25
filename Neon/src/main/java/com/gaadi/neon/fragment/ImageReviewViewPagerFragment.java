@@ -12,17 +12,15 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.media.ExifInterface;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.annotation.RequiresApi;
-import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -40,11 +38,9 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
-import com.gaadi.neon.activity.gallery.GridFoldersActivity;
 import com.gaadi.neon.adapter.ImageTagsAdapter;
 import com.gaadi.neon.events.ImageEditEvent;
 import com.gaadi.neon.interfaces.FragmentListener;
-import com.gaadi.neon.interfaces.ICameraParam;
 import com.gaadi.neon.interfaces.INeutralParam;
 import com.gaadi.neon.model.ImageTagModel;
 import com.gaadi.neon.util.Constants;
@@ -507,7 +503,7 @@ public class ImageReviewViewPagerFragment extends Fragment implements View.OnCli
                         .diskCacheStrategy(DiskCacheStrategy.NONE)
                         .skipMemoryCache(true)
                         .placeholder(R.drawable.default_placeholder);
-                Glide.with(this).load(imageModel.getFilePath())
+                Glide.with(getContext()).load(imageModel.getFilePath())
                         .apply(options)
                         .into(draweeView);
             }

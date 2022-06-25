@@ -29,11 +29,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -46,6 +42,12 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
+
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.gaadi.neon.activity.ImageReviewActivity;
@@ -302,11 +304,11 @@ public class CameraFragment1 extends Fragment implements View.OnTouchListener, C
     public void setMask(String maskUrl) {
         if(isAdded()){
             if(!TextUtils.isEmpty(maskUrl)){
-                Glide.with(this)
+                Glide.with(getContext())
                         .load(maskUrl)
                         .into(maskImg);
             }else{
-                Glide.with(this)
+                Glide.with(getContext())
                         .clear(maskImg);
             }
         }
