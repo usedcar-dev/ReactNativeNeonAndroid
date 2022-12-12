@@ -1,10 +1,14 @@
 package com.gaadi.neon.util;
 
+import static com.gaadi.neon.util.Constants.TAG;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.BitmapFactory;
 import android.media.ExifInterface;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.gaadi.neon.enumerations.LibraryMode;
@@ -310,18 +314,28 @@ public class NeonImagesHandler {
                     String latitude = "0";
                     String longitude = "0";
                     String timestamp = "0";
+                    long imgSize = 0;
+                    int imgHeight = 0;
+                    int imgWidth = 0;
                     try {
                         File file = new File(fileInfo.getFilePath());
                         ExifInterfaceHandling exifInterfaceHandling = new ExifInterfaceHandling(file);
                         latitude = exifInterfaceHandling.getAttribute(ExifInterface.TAG_GPS_LATITUDE_REF);
                         longitude = exifInterfaceHandling.getAttribute(ExifInterface.TAG_GPS_LONGITUDE_REF);
                         timestamp = exifInterfaceHandling.getAttribute(ExifInterface.TAG_DATETIME);
+                        int heightWidth[] = getImgHeightWidth(file);
+                        imgWidth = heightWidth[1];
+                        imgHeight = heightWidth[0];
+                        imgSize = getImgSize(file);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
                     fileInfo.setLatitude(latitude);
                     fileInfo.setLongitude(longitude);
                     fileInfo.setTimestamp(timestamp);
+                    fileInfo.setImgSize(imgSize);
+                    fileInfo.setImgHeight(imgHeight);
+                    fileInfo.setImgWidth(imgWidth);
                     fileInfos.add(fileInfo);
 
                 }
@@ -355,7 +369,17 @@ public class NeonImagesHandler {
                                 }
 //                                NeonUtils.compressImage(30, newFile.getAbsolutePath(), 1024, 900);
                                 NeonUtils.scanFile(activity, newFile.getAbsolutePath());
+                                long imgSize = 0;
+                                int imgHeight = 0;
+                                int imgWidth = 0;
+                                int heightWidth[] = getImgHeightWidth(newFile);
+                                imgHeight = heightWidth[0];
+                                imgWidth = heightWidth[1];
+                                imgSize = getImgSize(newFile);
                                 FileInfo newFileInfo = fileInfos.get(i);
+                                newFileInfo.setImgHeight(imgHeight);
+                                newFileInfo.setImgWidth(imgWidth);
+                                newFileInfo.setImgSize(imgSize);
                                 newFileInfo.setFilePath(newFile.getAbsolutePath());
                                 newFileInfos.add(newFileInfo);
                             } else {
@@ -380,6 +404,23 @@ public class NeonImagesHandler {
             e.printStackTrace();
         }
 
+    }
+
+
+    private int[] getImgHeightWidth(File file) {
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        BitmapFactory.decodeFile(file.getAbsolutePath(), options);
+        int imageHeight = options.outHeight;
+        int imageWidth = options.outWidth;
+        int[] heightWidth= new int[2];  //initializing array
+        heightWidth[0] = imageHeight;
+        heightWidth[1] = imageWidth;
+        return heightWidth;
+    }
+
+    private long getImgSize(File file) {
+        return (file.length())/1000;
     }
 
     public void showBackOperationAlertIfNeeded(final Activity activity) {

@@ -23,6 +23,9 @@ public class FileInfo implements Serializable {
     private String latitude;
     private String longitude;
     private String timestamp;
+    private int imgHeight;
+    private int imgWidth;
+    private long imgSize;
 
     public boolean isSelected() {
         return selected;
@@ -142,6 +145,30 @@ public class FileInfo implements Serializable {
 
     public void setLongitude(String longitude) {
         this.longitude = longitude;
+    }
+
+    public void setImgHeight(int imgHeight) {
+        this.imgHeight = imgHeight;
+    }
+
+    public int getImgHeight() {
+        return imgHeight;
+    }
+
+    public void setImgWidth(int imgWidth) {
+        this.imgWidth = imgWidth;
+    }
+
+    public int getImgWidth() {
+        return imgWidth;
+    }
+
+    public void setImgSize(long imgSize) {
+        this.imgSize = imgSize;
+    }
+
+    public long getImgSize() {
+        return imgSize;
     }
 
     public String getLatitude() {
