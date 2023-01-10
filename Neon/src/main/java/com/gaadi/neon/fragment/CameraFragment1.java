@@ -321,6 +321,7 @@ public class CameraFragment1 extends Fragment implements View.OnTouchListener, C
             if(locationRestrictive && LocationHolder.getInstance().getLocation()==null)
             {
                 Toast.makeText(getActivity(), "Fetching Location...", Toast.LENGTH_SHORT).show();
+                locationTracker.getLocation();
             }
             else
             {
