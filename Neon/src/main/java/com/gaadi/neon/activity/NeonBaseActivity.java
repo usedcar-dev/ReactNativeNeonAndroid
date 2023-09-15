@@ -151,7 +151,9 @@ public abstract class NeonBaseActivity extends AppCompatActivity {
                 goForPermission(new String[]{Manifest.permission.RECEIVE_MMS});
                 break;
             case read_external_storage:
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    goForPermission(new String[]{Manifest.permission.READ_MEDIA_IMAGES});
+                } else {
                     goForPermission(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE});
                 }
                 break;
